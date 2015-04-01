@@ -51,3 +51,9 @@ bool StereoRecordInput::GetNextPair(struct StereoPair& stereoPair)
 	stereoPair.timestamp = atof(timestamp_s.c_str());
 	return true;
 }
+
+void StereoRecordInput::Reset()
+{
+	filestream.clear();
+	filestream.seekg(0, filestream.beg);
+}

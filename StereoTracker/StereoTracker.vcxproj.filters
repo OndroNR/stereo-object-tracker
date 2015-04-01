@@ -27,6 +27,9 @@
     <ClCompile Include="common.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="StereoCalibrate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StereoVideoInput.h">
@@ -36,6 +39,15 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="StereoRecordInput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StereoCalibrate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Fps.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Interval.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

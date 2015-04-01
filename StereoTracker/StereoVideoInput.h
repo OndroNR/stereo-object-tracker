@@ -8,5 +8,6 @@ public:
 	StereoVideoInput(void);
 	~StereoVideoInput(void);
 	virtual bool GetNextPair(struct StereoPair &stereoPair) = 0;
+	virtual void Reset() = 0;
 };
 
