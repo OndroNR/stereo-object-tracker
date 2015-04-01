@@ -19,6 +19,7 @@ void showMenu()
 	cout << "4 - load calibration\n";
 	cout << "5 - play video\n";
 	cout << "6 - reset stream\n";
+	cout << "7 - play remapped + bg subtraction\n";
 	cout << "q - quit\n";
 	cout << "Select command: ";
 }
@@ -31,10 +32,11 @@ int main( int argc, char** argv )
 
 	StereoVideoInput* svi = NULL;
 	StereoCalibrate* sc = NULL;
-	StereoCalibration scp;
+	StereoCalibration* scp = NULL;
 	FileStorage fs;
 	Fps fps;
 	int counter = 0;
+
 
 	while (!quit)
 	{
@@ -64,9 +66,9 @@ int main( int argc, char** argv )
 			sc->calibrate(true);
 
 			if (sc->isCalibrated())
-				scp = sc->getCalibrationParams();
+				scp = &sc->getCalibrationParams();
 
-			cout << scp << endl;
+			cout << *scp << endl;
 
 			break;
 		case '3':
@@ -75,15 +77,15 @@ int main( int argc, char** argv )
 				cout << "Not calibrated";
 				break;
 			}
-			else if (!sc->isCalibrated())
+			else if (scp == NULL)
 			{
 				cout << "Calibration missing (failed?)";
 				break;
 			}
 
-			scp = sc->getCalibrationParams();
+			scp = &sc->getCalibrationParams();
 			fs = FileStorage("stereo_calibration.xml", FileStorage::WRITE);
-			fs << "stereo_calibration" << scp;
+			fs << "stereo_calibration" << *scp;
 			fs.release();
 			cout << "Calibration saved" << endl;
 
@@ -98,9 +100,10 @@ int main( int argc, char** argv )
 				break;
 			}
 
-			fs["stereo_calibration"] >> scp;
+			scp = new StereoCalibration();
+			fs["stereo_calibration"] >> *scp;
 			cout << "Calibration loaded" << endl;
-			cout << scp;
+			cout << *scp;
 
 			break;
 		case '5':
@@ -138,6 +141,75 @@ int main( int argc, char** argv )
 				svi->Reset();
 
 			break;
+		case '7':
+			{
+				if (svi == NULL)
+				{
+					cout << "Stereo stream not loaded";
+					break;
+				}
+
+				if (scp == NULL)
+				{
+					cout << "Calibration missing";
+					break;
+				}
+
+				fps = Fps();
+				counter = 0;
+
+				RectificationParams* rp = new RectificationParams();
+				stereoRectify(scp->cameraMatrix[0], scp->distCoeffs[0],
+							  scp->cameraMatrix[1], scp->distCoeffs[1],
+							  Size(640,480), scp->R, scp->T, rp->R1, rp->R2, rp->P1, rp->P2, rp->Q,
+							  CALIB_ZERO_DISPARITY, 1, Size(640,480), &rp->validRoi[0], &rp->validRoi[1]);
+
+				Mat rmap[2][2];			
+				initUndistortRectifyMap(scp->cameraMatrix[0], scp->distCoeffs[0], rp->R1, rp->P1, Size(640,480), CV_16SC2, rmap[0][0], rmap[0][1]);
+				initUndistortRectifyMap(scp->cameraMatrix[1], scp->distCoeffs[1], rp->R2, rp->P2, Size(640,480), CV_16SC2, rmap[1][0], rmap[1][1]);
+				Mat remap[2];
+
+				BackgroundSubtractorMOG2 pMOG2[2];
+				Mat fgMaskMOG2[2];
+
+
+				for (;;)
+				{
+					struct StereoPair sp;
+					svi->GetNextPair(sp);
+					imshow("Input pair", sideBySideMat(sp.frames[0], sp.frames[1]));
+
+					
+					cv::remap(sp.frames[0], remap[0], rmap[0][0], rmap[0][1], CV_INTER_LINEAR);
+					cv::remap(sp.frames[1], remap[1], rmap[1][0], rmap[1][1], CV_INTER_LINEAR);
+
+					imshow("Remapped pair", sideBySideMat(remap[0], remap[1]));
+
+					pMOG2[0](remap[0], fgMaskMOG2[0]);
+					pMOG2[1](remap[1], fgMaskMOG2[1]);
+
+					imshow("Foreground mask left", fgMaskMOG2[0]);
+					imshow("Foreground mask right", fgMaskMOG2[1]);
+
+					fps.update();
+					counter++;
+					if (counter % 10 == 0)
+						std::cout << "Processing fps: " << fps.get() << endl;
+
+					int key = waitKey(5);
+					if(key >= 0)
+					{
+						break;
+					}
+				}
+
+				delete rp;
+
+				cv::destroyWindow("Input pair");
+				cv::destroyWindow("Remapped pair");
+				//cv::destroyWindow("Foreground mask");
+				break;
+			}
 		case 'q':
 		case 'Q':
 			quit = true;
