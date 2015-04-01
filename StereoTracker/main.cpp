@@ -45,7 +45,8 @@ int main( int argc, char** argv )
 			{
 				delete svi;
 			}
-			svi = new StereoRecordInput("f:\\galbavy\\data\\dp\\stereo\\150326-104514 kalibracia\\", "", "list.txt");
+			//svi = new StereoRecordInput("f:\\galbavy\\data\\dp\\stereo\\150326-104514 kalibracia\\", "", "list.txt");
+			svi = new StereoRecordInput("f:\\galbavy\\data\\dp\\stereo\\150326-121755 kalibracia autofocus\\", "", "list.txt");
 			break;
 		case '2':
 			if (svi == NULL)
@@ -54,7 +55,10 @@ int main( int argc, char** argv )
 				break;
 			}
 
-			// go!
+			if (sc != NULL)
+				delete sc;
+			sc = new StereoCalibrate(svi, Size(10, 7), 2.4); // 10x7 squares, 2.4cm square size
+			sc->calibrate(true);
 
 			break;
 		case '3':

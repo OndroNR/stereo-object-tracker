@@ -44,11 +44,20 @@ bool StereoRecordInput::GetNextPair(struct StereoPair& stereoPair)
 	string timestamp_s;
 	getline(filestream, timestamp_s);
 
+	if (filename_base.empty())
+		return false;
+
 	string left_path = frames_path + PATH_SEPARATOR + filename_base + "l.tiff";
 	string right_path = frames_path + PATH_SEPARATOR + filename_base + "r.tiff";
 	stereoPair.frames[0] = imread(left_path);
 	stereoPair.frames[1] = imread(right_path);
 	stereoPair.timestamp = atof(timestamp_s.c_str());
+
+	if (stereoPair.frames[0].empty())
+		return false;
+	if (stereoPair.frames[1].empty())
+		return false;
+
 	return true;
 }
 
