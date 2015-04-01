@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
 
@@ -10,6 +11,7 @@
 #endif 
 
 using namespace cv;
+using namespace std;
 
 struct StereoPair
 {
@@ -26,15 +28,52 @@ struct StereoCalibration
 	Mat E; // Essential matrix
 	Mat F; // Fundamental matrix
 	Size chessboard_size;
-	double chessboard_square_size;
+	float chessboard_square_size;
 
-	double rms; // reprojection error
+	double rms; // RMS error
+	double avg_reprojection_error; // Average reprojection error
 
 	StereoCalibration()
 	{
 		cameraMatrix[0] = Mat::eye(3, 3, CV_64F);
 		cameraMatrix[1] = Mat::eye(3, 3, CV_64F);
 	}
+
+    void write(FileStorage& fs) const // Write serialization for this class
+    {
+		fs << "{"
+			<< "CM0" << cameraMatrix[0]
+			<< "CM1" << cameraMatrix[1]
+			<< "DC0" << distCoeffs[0]
+			<< "DC1" << distCoeffs[1]
+			<< "R" << R
+			<< "T" << T
+			<< "E" << E
+			<< "F" << F
+			<< "chessboard_size" << chessboard_size
+			<< "chessboard_square_size" << chessboard_square_size
+			<< "rms" << rms
+			<< "avg_reprojection_error" << avg_reprojection_error
+			<< "}";
+    }
+
+	void read(const FileNode& node) // Read serialization for this class
+    {
+		node["CM0"] >> cameraMatrix[0];
+		node["CM1"] >> cameraMatrix[1];
+		node["DC0"] >> distCoeffs[0];
+		node["DC1"] >> distCoeffs[1];
+		node["R"] >> R;
+		node["T"] >> T;
+		node["E"] >> E;
+		node["F"] >> F;
+		node["chessboard_size"] >> chessboard_size;
+		node["chessboard_square_size"] >> chessboard_square_size;
+		node["rms"] >> rms;
+		node["avg_reprojection_error"] >> avg_reprojection_error;
+    }
+
+	friend ostream& operator<<(ostream& out, const StereoCalibration& d);
 };
 
 struct RectificationParams
@@ -46,3 +85,5 @@ struct RectificationParams
 };
 
 cv::Mat sideBySideMat(cv::Mat a, cv::Mat b);
+void write(FileStorage& fs, const std::string&, const StereoCalibration& x);
+void read(const FileNode& node, StereoCalibration& x, const StereoCalibration& default_value = StereoCalibration());

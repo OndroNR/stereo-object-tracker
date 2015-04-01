@@ -16,8 +16,9 @@ void showMenu()
 	cout << "1 - open stereo record\n";
 	cout << "2 - run calibration\n";
 	cout << "3 - save calibration\n";
-	cout << "4 - play video\n";
-	cout << "5 - reset stream\n";
+	cout << "4 - load calibration\n";
+	cout << "5 - play video\n";
+	cout << "6 - reset stream\n";
 	cout << "q - quit\n";
 	cout << "Select command: ";
 }
@@ -30,6 +31,8 @@ int main( int argc, char** argv )
 
 	StereoVideoInput* svi = NULL;
 	StereoCalibrate* sc = NULL;
+	StereoCalibration scp;
+	FileStorage fs;
 	Fps fps;
 	int counter = 0;
 
@@ -57,13 +60,50 @@ int main( int argc, char** argv )
 
 			if (sc != NULL)
 				delete sc;
-			sc = new StereoCalibrate(svi, Size(10, 7), 2.4); // 10x7 squares, 2.4cm square size
+			sc = new StereoCalibrate(svi, Size(10, 7), 2.4f); // 10x7 squares, 2.4cm square size
 			sc->calibrate(true);
+
+			if (sc->isCalibrated())
+				scp = sc->getCalibrationParams();
+
+			cout << scp << endl;
 
 			break;
 		case '3':
+			if (sc == NULL)
+			{
+				cout << "Not calibrated";
+				break;
+			}
+			else if (!sc->isCalibrated())
+			{
+				cout << "Calibration missing (failed?)";
+				break;
+			}
+
+			scp = sc->getCalibrationParams();
+			fs = FileStorage("stereo_calibration.xml", FileStorage::WRITE);
+			fs << "stereo_calibration" << scp;
+			fs.release();
+			cout << "Calibration saved" << endl;
+
 			break;
 		case '4':
+			fs = FileStorage();
+			fs.open("stereo_calibration.xml", FileStorage::READ);
+
+			if (!fs.isOpened())
+			{
+				cerr << "Failed to open calibration file" << endl;
+				break;
+			}
+
+			fs["stereo_calibration"] >> scp;
+			cout << "Calibration loaded" << endl;
+			cout << scp;
+
+			break;
+		case '5':
 			if (svi == NULL)
 			{
 				cout << "Stereo stream not loaded";
@@ -93,7 +133,7 @@ int main( int argc, char** argv )
 
 			cv::destroyWindow("Input pair");
 			break;
-		case '5':
+		case '6':
 			if (svi != NULL)
 				svi->Reset();
 

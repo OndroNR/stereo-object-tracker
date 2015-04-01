@@ -4,7 +4,7 @@
 using namespace std;
 using namespace cv;
 
-StereoCalibrate::StereoCalibrate(StereoVideoInput* svi, Size board_size, double board_square_size)
+StereoCalibrate::StereoCalibrate(StereoVideoInput* svi, Size board_size, float board_square_size)
 {
 	if (!svi)
 		throw std::runtime_error("StereoVideoInput is null");
@@ -19,20 +19,27 @@ StereoCalibrate::~StereoCalibrate(void)
 {
 }
 
+// base on OpenCV C++ sample stereo_calib
 void StereoCalibrate::calibrate(bool showImages)
 {
 	vector<vector<Point2f>> imagePoints[2];
     vector<vector<Point3f>> objectPoints;
     Size image_size;
 	int chessboard_count = 0;
+	int frame_no = 0;
 
 	imagePoints[0].resize(2000);
 	imagePoints[1].resize(2000);
+
+	cout << "Stereo calibration begin" << endl;
 
 	struct StereoPair sp;
 	while(svi->GetNextPair(sp))
 	{
 		bool found = false;
+
+		frame_no++;
+		cout << "Frame number: " << frame_no << endl;
 
 		for (int i = 0; i < 2; i++)
 		{
@@ -78,8 +85,8 @@ void StereoCalibrate::calibrate(bool showImages)
 	destroyWindow("Stereo calibration");
 
 	if (chessboard_count < 2){
-		cout << "Not enough chessboards found" << endl;
-		throw runtime_error("Not enough chessboards found!");
+		cerr << "Not enough chessboards found" << endl;
+		return;
     }
 
 	imagePoints[0].resize(chessboard_count);
@@ -92,7 +99,7 @@ void StereoCalibrate::calibrate(bool showImages)
                 objectPoints[i].push_back(Point3f(j * board_square_size, k * board_square_size, 0));
 	}
 
-	StereoCalibration sc;
+	cout << "Stereo calibration calculation begin" << endl;
 
     sc.rms = stereoCalibrate(objectPoints, imagePoints[0], imagePoints[1],
                     sc.cameraMatrix[0], sc.distCoeffs[0],
@@ -105,10 +112,53 @@ void StereoCalibrate::calibrate(bool showImages)
                     CV_CALIB_RATIONAL_MODEL +
                     CV_CALIB_FIX_K3 + CV_CALIB_FIX_K4 + CV_CALIB_FIX_K5);
 
-	cout << "Stereo calibration reprojection error: " << sc.rms << endl;
+	cout << "Stereo calibration done" << endl;
+	cout << "RMS error: " << sc.rms << endl;
+
+	// CALIBRATION QUALITY CHECK
+	// because the output fundamental matrix implicitly
+	// includes all the output information,
+	// we can check the quality of calibration using the
+	// epipolar geometry constraint: m2^t*F*m1=0
+	double err = 0;
+	int npoints = 0;
+	vector<Vec3f> lines[2];
+	for( int i = 0; i < chessboard_count; i++ )
+	{
+		int npt = (int)imagePoints[0][i].size();
+		Mat imgpt[2];
+		for( int k = 0; k < 2; k++ )
+		{
+			imgpt[k] = Mat(imagePoints[k][i]);
+			undistortPoints(imgpt[k], imgpt[k], sc.cameraMatrix[k], sc.distCoeffs[k], Mat(), sc.cameraMatrix[k]);
+			computeCorrespondEpilines(imgpt[k], k+1, sc.F, lines[k]);
+		}
+		for( int j = 0; j < npt; j++ )
+		{
+			double errij = fabs(imagePoints[0][i][j].x*lines[1][j][0] +
+				imagePoints[0][i][j].y*lines[1][j][1] + lines[1][j][2]) +
+				fabs(imagePoints[1][i][j].x*lines[0][j][0] +
+				imagePoints[1][i][j].y*lines[0][j][1] + lines[0][j][2]);
+			err += errij;
+		}
+		npoints += npt;
+	}
+	sc.avg_reprojection_error = err/npoints;
+	cout << "Average reprojection error = " <<  sc.avg_reprojection_error << endl;
+	cout << endl;
+
+	sc.chessboard_size = board_size;
+	sc.chessboard_square_size = board_square_size;
+
+	is_calibrated = true;
 }
 
 bool StereoCalibrate::isCalibrated()
 {
 	return is_calibrated;
+}
+
+StereoCalibration StereoCalibrate::getCalibrationParams()
+{
+	return sc;
 }
