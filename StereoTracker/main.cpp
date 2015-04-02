@@ -66,7 +66,7 @@ int main( int argc, char** argv )
 			sc->calibrate(true);
 
 			if (sc->isCalibrated())
-				scp = &sc->getCalibrationParams();
+				scp = sc->getCalibrationParams();
 
 			cout << *scp << endl;
 
@@ -83,7 +83,7 @@ int main( int argc, char** argv )
 				break;
 			}
 
-			scp = &sc->getCalibrationParams();
+			scp = sc->getCalibrationParams();
 			fs = FileStorage("stereo_calibration.xml", FileStorage::WRITE);
 			fs << "stereo_calibration" << *scp;
 			fs.release();

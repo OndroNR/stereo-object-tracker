@@ -12,6 +12,7 @@ StereoCalibrate::StereoCalibrate(StereoVideoInput* svi, Size board_size, float b
 	this->svi = svi;
 	this->board_size = board_size;
 	this->board_square_size = board_square_size;
+	this->sc = new StereoCalibration();
 }
 
 
@@ -101,10 +102,10 @@ void StereoCalibrate::calibrate(bool showImages)
 
 	cout << "Stereo calibration calculation begin" << endl;
 
-    sc.rms = stereoCalibrate(objectPoints, imagePoints[0], imagePoints[1],
-                    sc.cameraMatrix[0], sc.distCoeffs[0],
-                    sc.cameraMatrix[1], sc.distCoeffs[1],
-                    image_size, sc.R, sc.T, sc.E, sc.F,
+    sc->rms = stereoCalibrate(objectPoints, imagePoints[0], imagePoints[1],
+                    sc->cameraMatrix[0], sc->distCoeffs[0],
+                    sc->cameraMatrix[1], sc->distCoeffs[1],
+                    image_size, sc->R, sc->T, sc->E, sc->F,
                     TermCriteria(CV_TERMCRIT_ITER+CV_TERMCRIT_EPS, 100, 1e-5),
                     CV_CALIB_FIX_ASPECT_RATIO +
                     CV_CALIB_ZERO_TANGENT_DIST +
@@ -113,7 +114,7 @@ void StereoCalibrate::calibrate(bool showImages)
                     CV_CALIB_FIX_K3 + CV_CALIB_FIX_K4 + CV_CALIB_FIX_K5);
 
 	cout << "Stereo calibration done" << endl;
-	cout << "RMS error: " << sc.rms << endl;
+	cout << "RMS error: " << sc->rms << endl;
 
 	// CALIBRATION QUALITY CHECK
 	// because the output fundamental matrix implicitly
@@ -130,8 +131,8 @@ void StereoCalibrate::calibrate(bool showImages)
 		for( int k = 0; k < 2; k++ )
 		{
 			imgpt[k] = Mat(imagePoints[k][i]);
-			undistortPoints(imgpt[k], imgpt[k], sc.cameraMatrix[k], sc.distCoeffs[k], Mat(), sc.cameraMatrix[k]);
-			computeCorrespondEpilines(imgpt[k], k+1, sc.F, lines[k]);
+			undistortPoints(imgpt[k], imgpt[k], sc->cameraMatrix[k], sc->distCoeffs[k], Mat(), sc->cameraMatrix[k]);
+			computeCorrespondEpilines(imgpt[k], k+1, sc->F, lines[k]);
 		}
 		for( int j = 0; j < npt; j++ )
 		{
@@ -143,12 +144,12 @@ void StereoCalibrate::calibrate(bool showImages)
 		}
 		npoints += npt;
 	}
-	sc.avg_reprojection_error = err/npoints;
-	cout << "Average reprojection error = " <<  sc.avg_reprojection_error << endl;
+	sc->avg_reprojection_error = err/npoints;
+	cout << "Average reprojection error = " <<  sc->avg_reprojection_error << endl;
 	cout << endl;
 
-	sc.chessboard_size = board_size;
-	sc.chessboard_square_size = board_square_size;
+	sc->chessboard_size = board_size;
+	sc->chessboard_square_size = board_square_size;
 
 	is_calibrated = true;
 }
@@ -158,7 +159,7 @@ bool StereoCalibrate::isCalibrated()
 	return is_calibrated;
 }
 
-StereoCalibration StereoCalibrate::getCalibrationParams()
+StereoCalibration* StereoCalibrate::getCalibrationParams()
 {
 	return sc;
 }

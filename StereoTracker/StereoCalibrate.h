@@ -13,12 +13,12 @@ private:
 	bool is_calibrated;
 	Size board_size;
 	float board_square_size;
-	StereoCalibration sc;
+	StereoCalibration* sc;
 public:
 	StereoCalibrate(StereoVideoInput* svi, Size board_size, float board_square_size);
 	~StereoCalibrate(void);
 	void calibrate(bool showImages);
 	bool isCalibrated();
-	StereoCalibration StereoCalibrate::getCalibrationParams();
+	StereoCalibration* StereoCalibrate::getCalibrationParams();
 };
 
