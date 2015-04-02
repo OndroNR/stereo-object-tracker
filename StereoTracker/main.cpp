@@ -5,6 +5,7 @@
 #include "StereoRecordInput.h"
 #include "StereoCalibrate.h"
 #include "StereoPreprocessing.h"
+#include "BackgroundProcessing.h"
 #include "Fps.h"
 
 using namespace cv;
@@ -162,10 +163,9 @@ int main( int argc, char** argv )
 				StereoPair remap;
 
 				StereoPreprocessing stereoPrep(scp, Size(640,480), 1);
-				
 
-				BackgroundSubtractorMOG2 pMOG2[2];
-				Mat fgMaskMOG2[2];
+				BackgroundProcessing bgProc;
+				StereoPair fgMaskMOG2;
 
 
 				for (;;)
@@ -178,11 +178,10 @@ int main( int argc, char** argv )
 
 					imshow("Remapped pair", sideBySideMat(remap.frames[0], remap.frames[1]));
 
-					pMOG2[0](remap.frames[0], fgMaskMOG2[0]);
-					pMOG2[1](remap.frames[1], fgMaskMOG2[1]);
+					bgProc.ProcessPair(remap, fgMaskMOG2);
 
-					imshow("Foreground mask left", fgMaskMOG2[0]);
-					imshow("Foreground mask right", fgMaskMOG2[1]);
+					imshow("Foreground mask left", fgMaskMOG2.frames[0]);
+					imshow("Foreground mask right", fgMaskMOG2.frames[1]);
 
 					fps.update();
 					counter++;
