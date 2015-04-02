@@ -4,6 +4,7 @@
 #include "StereoVideoInput.h"
 #include "StereoRecordInput.h"
 #include "StereoCalibrate.h"
+#include "StereoPreprocessing.h"
 #include "Fps.h"
 
 using namespace cv;
@@ -158,16 +159,10 @@ int main( int argc, char** argv )
 				fps = Fps();
 				counter = 0;
 
-				RectificationParams* rp = new RectificationParams();
-				stereoRectify(scp->cameraMatrix[0], scp->distCoeffs[0],
-							  scp->cameraMatrix[1], scp->distCoeffs[1],
-							  Size(640,480), scp->R, scp->T, rp->R1, rp->R2, rp->P1, rp->P2, rp->Q,
-							  CALIB_ZERO_DISPARITY, 1, Size(640,480), &rp->validRoi[0], &rp->validRoi[1]);
+				StereoPair remap;
 
-				Mat rmap[2][2];			
-				initUndistortRectifyMap(scp->cameraMatrix[0], scp->distCoeffs[0], rp->R1, rp->P1, Size(640,480), CV_16SC2, rmap[0][0], rmap[0][1]);
-				initUndistortRectifyMap(scp->cameraMatrix[1], scp->distCoeffs[1], rp->R2, rp->P2, Size(640,480), CV_16SC2, rmap[1][0], rmap[1][1]);
-				Mat remap[2];
+				StereoPreprocessing stereoPrep(scp, Size(640,480), 1);
+				
 
 				BackgroundSubtractorMOG2 pMOG2[2];
 				Mat fgMaskMOG2[2];
@@ -179,14 +174,12 @@ int main( int argc, char** argv )
 					svi->GetNextPair(sp);
 					imshow("Input pair", sideBySideMat(sp.frames[0], sp.frames[1]));
 
-					
-					cv::remap(sp.frames[0], remap[0], rmap[0][0], rmap[0][1], CV_INTER_LINEAR);
-					cv::remap(sp.frames[1], remap[1], rmap[1][0], rmap[1][1], CV_INTER_LINEAR);
+					stereoPrep.ProcessPair(sp, remap);
 
-					imshow("Remapped pair", sideBySideMat(remap[0], remap[1]));
+					imshow("Remapped pair", sideBySideMat(remap.frames[0], remap.frames[1]));
 
-					pMOG2[0](remap[0], fgMaskMOG2[0]);
-					pMOG2[1](remap[1], fgMaskMOG2[1]);
+					pMOG2[0](remap.frames[0], fgMaskMOG2[0]);
+					pMOG2[1](remap.frames[1], fgMaskMOG2[1]);
 
 					imshow("Foreground mask left", fgMaskMOG2[0]);
 					imshow("Foreground mask right", fgMaskMOG2[1]);
@@ -202,8 +195,6 @@ int main( int argc, char** argv )
 						break;
 					}
 				}
-
-				delete rp;
 
 				cv::destroyWindow("Input pair");
 				cv::destroyWindow("Remapped pair");

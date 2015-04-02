@@ -83,6 +83,7 @@
     <ClCompile Include="common.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="StereoCalibrate.cpp" />
+    <ClCompile Include="StereoPreprocessing.cpp" />
     <ClCompile Include="StereoRecordInput.cpp" />
     <ClCompile Include="StereoVideoInput.cpp" />
   </ItemGroup>
@@ -91,6 +92,7 @@
     <ClInclude Include="Fps.h" />
     <ClInclude Include="Interval.h" />
     <ClInclude Include="StereoCalibrate.h" />
+    <ClInclude Include="StereoPreprocessing.h" />
     <ClInclude Include="StereoRecordInput.h" />
     <ClInclude Include="StereoVideoInput.h" />
   </ItemGroup>
