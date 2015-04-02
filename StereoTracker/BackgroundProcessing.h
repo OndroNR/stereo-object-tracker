@@ -12,5 +12,7 @@ public:
 	bool ProcessPair(struct StereoPair& frames, struct StereoPair& foregroundMask);
 	BackgroundSubtractorMOG2 mog[2];
 	BackgroundSubtractorMOG2 initMOG();
+	Mat morphElement;
+	bool morphologyProcessing;
 };
 
