@@ -6,6 +6,7 @@
 #include "StereoCalibrate.h"
 #include "StereoPreprocessing.h"
 #include "BackgroundProcessing.h"
+#include "MotionTracking.h"
 #include "Fps.h"
 
 using namespace cv;
