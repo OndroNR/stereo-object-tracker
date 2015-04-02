@@ -180,8 +180,7 @@ int main( int argc, char** argv )
 
 					bgProc.ProcessPair(remap, fgMaskMOG2);
 
-					imshow("Foreground mask left", fgMaskMOG2.frames[0]);
-					imshow("Foreground mask right", fgMaskMOG2.frames[1]);
+					imshow("Foreground mask", sideBySideMat(fgMaskMOG2.frames[0], fgMaskMOG2.frames[1]));
 
 					fps.update();
 					counter++;
@@ -197,7 +196,7 @@ int main( int argc, char** argv )
 
 				cv::destroyWindow("Input pair");
 				cv::destroyWindow("Remapped pair");
-				//cv::destroyWindow("Foreground mask");
+				cv::destroyWindow("Foreground mask");
 				break;
 			}
 		case 'q':

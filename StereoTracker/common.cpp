@@ -7,7 +7,7 @@ Mat sideBySideMat(Mat a, Mat b)
 {
 	Size a_s = a.size();
 	Size b_s = b.size();
-	Mat out(max(a_s.height, b_s.height), a_s.width + b_s.width, CV_8UC3);
+	Mat out(max(a_s.height, b_s.height), a_s.width + b_s.width, a.type());
 
     out.adjustROI(0, 0, 0, -b_s.width);
     a.copyTo(out);
