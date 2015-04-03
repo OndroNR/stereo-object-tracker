@@ -14,8 +14,10 @@ public:
 	KeyPointEx() : KeyPoint()
 	{
 		lastMove = Point2f(0,0);
+		scheduledDelete = false;
+		unusedFor = 0;
 	}
-	KeyPointEx(KeyPoint kp)
+	KeyPointEx(KeyPoint& kp)
 	{
 		this->pt = kp.pt;
 		this->size = kp.size;
@@ -23,12 +25,16 @@ public:
 		this->response = kp.response;
 		this->octave = kp.octave;
 		this->class_id = kp.class_id;
+
+		lastMove = Point2f(0,0);
+		scheduledDelete = false;
+		unusedFor = 0;
 	}
-	bool sameAs(KeyPoint kp)
+	bool sameAs(KeyPoint& kp)
 	{
 		return this->pt.x == kp.pt.x && this->pt.y == kp.pt.y;
 	}
-	bool sameAs(KeyPointEx kp)
+	bool sameAs(KeyPointEx& kp)
 	{
 		return this->pt.x == kp.pt.x && this->pt.y == kp.pt.y;
 	}

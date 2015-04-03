@@ -27,6 +27,45 @@ void showMenu()
 	cout << "Select command: ";
 }
 
+const int draw_shift_bits = 4;
+const int draw_multiplier = 1 << draw_shift_bits;
+static inline void _drawKeypoint( Mat& img, const KeyPoint& p, const Scalar& color, int flags )
+{
+    CV_Assert( !img.empty() );
+    Point center( cvRound(p.pt.x * draw_multiplier), cvRound(p.pt.y * draw_multiplier) );
+
+    if( flags & DrawMatchesFlags::DRAW_RICH_KEYPOINTS )
+    {
+        int radius = cvRound(p.size/2 * draw_multiplier); // KeyPoint::size is a diameter
+
+        // draw the circles around keypoints with the keypoints size
+        circle( img, center, radius, color, 1, CV_AA, draw_shift_bits );
+
+        // draw orientation of the keypoint, if it is applicable
+        if( p.angle != -1 )
+        {
+            float srcAngleRad = p.angle*(float)CV_PI/180.f;
+            Point orient( cvRound(cos(srcAngleRad)*radius ),
+                          cvRound(sin(srcAngleRad)*radius )
+                        );
+            line( img, center, center+orient, color, 1, CV_AA, draw_shift_bits );
+        }
+#if 0
+        else
+        {
+            // draw center with R=1
+            int radius = 1 * draw_multiplier;
+            circle( img, center, radius, color, 1, CV_AA, draw_shift_bits );
+        }
+#endif
+    }
+    else
+    {
+        // draw center with R=3
+        int radius = 3 * draw_multiplier;
+        circle( img, center, radius, color, 1, CV_AA, draw_shift_bits );
+    }
+} 
 
 int main( int argc, char** argv )
 {
@@ -168,6 +207,12 @@ int main( int argc, char** argv )
 				BackgroundProcessing bgProc;
 				StereoPair fgMaskMOG2;
 
+				StereoPair remap_kp;
+
+				MotionTracking mt;
+
+				bool has_fg = false;
+
 
 				for (;;)
 				{
@@ -182,6 +227,31 @@ int main( int argc, char** argv )
 					bgProc.ProcessPair(remap, fgMaskMOG2);
 
 					imshow("Foreground mask", sideBySideMat(fgMaskMOG2.frames[0], fgMaskMOG2.frames[1]));
+
+					if (!has_fg)
+					{
+						has_fg = true;
+					}
+					else
+					{
+						mt.ProcessPair(remap, fgMaskMOG2);
+
+						//drawKeypoints(remap.frames[0], mt.kpx[0], remap_kp.frames[0]);
+						//drawKeypoints(remap.frames[0], dynamic_cast<vector<KeyPoint>>(mt.kpx[0]), remap_kp.frames[0]);
+
+						remap.frames[0].copyTo( remap_kp.frames[0] ); 
+						vector<KeyPointEx*>::const_iterator it = mt.kpx[0].begin(),
+														 end = mt.kpx[0].end();
+						RNG& rng=theRNG();
+						for( ; it != end; ++it )
+						{
+							Scalar color = Scalar(rng(256), rng(256), rng(256));
+							_drawKeypoint( remap_kp.frames[0], **it, color, DrawMatchesFlags::DEFAULT );
+						}
+					
+						imshow("Keypoints", remap_kp.frames[0]);
+						//imshow("Keypoints", sideBySideMat(remap_kp.frames[0], remap_kp.frames[1]));
+					}
 
 					fps.update();
 					counter++;

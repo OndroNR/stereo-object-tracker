@@ -33,19 +33,22 @@ void KeyPointEx::convert(const std::vector<KeyPointEx*>& keypoints, std::vector<
 MotionTracking::MotionTracking(void)
 {
 	frame_number = 0;
-	fd = new GoodFeaturesToTrackDetector();
+	//fd = new GoodFeaturesToTrackDetector(100);
+	fd = new FastFeatureDetector();
 }
 
 
 MotionTracking::~MotionTracking(void)
 {
+	//delete fd; // crashing
 }
 
 
 bool MotionTracking::ProcessPair(struct StereoPair& frames, struct StereoPair& fg_mask)
 {
 	// for left & right frame
-	for (int k = 0; k < 2; k++)
+	//for (int k = 0; k < 2; k++)
+	for (int k = 0; k < 1; k++)
 	{
 		// remove keypoints scheduled for deletion
 		for (vector<KeyPointEx*>::iterator it = kpx[k].begin(); it < kpx[k].end();)
@@ -65,20 +68,31 @@ bool MotionTracking::ProcessPair(struct StereoPair& frames, struct StereoPair& f
 		if (frame_number % 10 == 0) // sometime
 		{
 			vector<KeyPoint> new_kp;
+			vector<KeyPointEx*> new_kpx;
 			fd->detect(frames.frames[k], new_kp, fg_mask.frames[k]);
 
 			// add new unique keypoints; O(N^K)!
+			//kpx[k].resize(kpx[k].size() + new_kp.size());
 			for(vector<KeyPoint>::iterator it = new_kp.begin(); it != new_kp.end(); ++it)
 			{
-				for(vector<KeyPointEx*>::iterator it2 = kpx[k].begin(); it2 != kpx[k].end(); ++it2)
+				if (kpx[k].size() == 0)
 				{
-					//if (it->pt.x != (*it2)->pt.x || it->pt.y != (*it2)->pt.y) // round?
-					if (!(*it2)->sameAs(*it))
+					new_kpx.push_back(new KeyPointEx(*it));
+				}
+				else
+				{
+					for(vector<KeyPointEx*>::iterator it2 = kpx[k].begin(); it2 != kpx[k].end(); ++it2)
 					{
-						kpx[k].push_back(new KeyPointEx(*it));
+						//if (it->pt.x != (*it2)->pt.x || it->pt.y != (*it2)->pt.y) // round?
+						if (!(*it2)->sameAs(*it))
+						{
+							new_kpx.push_back(new KeyPointEx(*it));
+						}
 					}
 				}
 			}
+
+			kpx[k].insert(kpx[k].end(), new_kpx.begin(), new_kpx.end());
 		}
 
 		// calc optical flow, if we have some keypoints and previous frame
@@ -89,7 +103,8 @@ bool MotionTracking::ProcessPair(struct StereoPair& frames, struct StereoPair& f
 			vector<float> err;
 			KeyPointEx::convert(kpx[k], prev_points);
 			
-			calcOpticalFlowPyrLK(oldFrames.frames[k], frames.frames[k], prev_points, next_points, status, err);
+			if (prev_points.size() != 0)
+				calcOpticalFlowPyrLK(oldFrames.frames[k], frames.frames[k], prev_points, next_points, status, err);
 
 			for( size_t i = 0; i < next_points.size(); i++ ) 
 			{
@@ -117,12 +132,12 @@ bool MotionTracking::ProcessPair(struct StereoPair& frames, struct StereoPair& f
 		// find duplicates and schedule removal
 		if (frame_number % 3 == 0) // not always
 		{
-			for(vector<KeyPointEx*>::iterator it = kpx[k].begin(); it != kpx[k].end(); ++it)
+			for(vector<KeyPointEx*>::iterator it = kpx[k].begin(); it != kpx[k].end() - 1; ++it)
 			{
 				if ((*it)->scheduledDelete)
 					continue;
 
-				for(vector<KeyPointEx*>::iterator it2 = ++it; it2 != kpx[k].end(); ++it2)
+				for(vector<KeyPointEx*>::iterator it2 = it + 1; it2 != kpx[k].end(); ++it2)
 				{
 					if ((*it2)->scheduledDelete)
 						continue;
