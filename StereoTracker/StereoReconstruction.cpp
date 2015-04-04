@@ -10,6 +10,11 @@ StereoReconstruction::StereoReconstruction(void)
 
 StereoReconstruction::~StereoReconstruction(void)
 {
+	for (vector<KeyPointPair*>::iterator it = pairs.begin(); it < pairs.end();)
+	{
+		delete *it;
+		it = pairs.erase(it);
+	}
 }
 
 bool StereoReconstruction::Process(vector<KeyPointEx*> kpx[2], StereoPair& frames)
@@ -43,6 +48,14 @@ bool StereoReconstruction::Process(vector<KeyPointEx*> kpx[2], StereoPair& frame
 		}
 
 		// TODO: kontrola parov, ci este sedia ak neboli skontrolovane po N framoch. Ak nesedie, scheduleDelete na KPP aj KPX[2]
+		//for (vector<KeyPointPair*>::iterator it = pairs.begin(); it < pairs.end(); ++it)
+		//{
+		//	if ( (*it)->uncheckedFor > 10 )
+		//	{
+		//		// check
+		//		// scheduleDelete if failed
+		//	}
+		//}
 	}
 
 	if (kpx[0].size() != 0 && kpx[1].size() != 0)
@@ -52,10 +65,9 @@ bool StereoReconstruction::Process(vector<KeyPointEx*> kpx[2], StereoPair& frame
 		vector<bool> kp_direct_matched[2];
 		Mat descriptors[2];
 
-		// extract descriptor for keypoints, which won't be deleted and are not paired
-
 		for (int k = 0; k < 2; k++)
 		{
+			// extract descriptor for keypoints, which won't be deleted and are not paired
 			for(vector<KeyPointEx*>::iterator it = kpx[k].begin(); it < kpx[k].end() - 1; ++it)
 			{
 				if ( !(*it)->scheduledDelete && !(*it)->hasPair )
@@ -86,6 +98,7 @@ bool StereoReconstruction::Process(vector<KeyPointEx*> kpx[2], StereoPair& frame
 				if (true) // same movement
 				{
 					// TODO: - check na suladny pohyb - nesmie byt prilis rozdielny
+					// gain * deltaAngle + gain deltaVecSize
 
 				}
 
@@ -95,7 +108,6 @@ bool StereoReconstruction::Process(vector<KeyPointEx*> kpx[2], StereoPair& frame
 				pairs.push_back(new KeyPointPair(kp_direct_kpx[0][match->queryIdx], kp_direct_kpx[1][match->trainIdx], frames.timestamp));
 			}
 		}
-
 		
 		// unsuedFor++ for unmatched and bad matched keypoints
 		for (int k = 0; k < 2; k++)

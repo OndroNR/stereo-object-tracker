@@ -1,3 +1,8 @@
+#include <vld.h>
+//#define _CRTDBG_MAP_ALLOC
+//#include <stdlib.h>
+//#include <crtdbg.h>
+
 #include "common.h"
 #include <opencv2/opencv.hpp>
 #include <iostream>
@@ -213,6 +218,8 @@ int main( int argc, char** argv )
 				StereoPair remap_kp;
 
 				MotionTracking mt;
+				
+				KeyPointPair::Q = stereoPrep.rp->Q;
 
 				StereoReconstruction sr;
 				
@@ -301,6 +308,11 @@ int main( int argc, char** argv )
 	}
 
 	 
+	if (svi)
+		delete svi;
+	if (scp)
+		delete scp;
 
-
+	//_CrtDumpMemoryLeaks();
+	//cout << endl;
 }

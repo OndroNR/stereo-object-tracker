@@ -24,6 +24,7 @@ StereoPreprocessing::StereoPreprocessing(StereoCalibration* scp, Size imageSize,
 
 StereoPreprocessing::~StereoPreprocessing(void)
 {
+	delete rp;
 }
 
 

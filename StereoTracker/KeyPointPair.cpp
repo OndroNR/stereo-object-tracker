@@ -41,7 +41,6 @@ void KeyPointPair::update(double time)
 	
 Point3f KeyPointPair::calcWorldPt(Point3f camPt)
 {
-	return camPt;
 	vector<Point3f> camPtVec, worldPtVec;
 	camPtVec.push_back(camPt);
 	perspectiveTransform(camPtVec, worldPtVec, KeyPointPair::Q);

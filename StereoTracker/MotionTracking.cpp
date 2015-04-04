@@ -13,6 +13,14 @@ MotionTracking::MotionTracking(void)
 
 MotionTracking::~MotionTracking(void)
 {
+	for (int k = 0; k < 2; k++)
+	{
+		for (vector<KeyPointEx*>::iterator it = kpx[k].begin(); it < kpx[k].end();)
+		{
+			delete *it;
+			it = kpx[k].erase(it);
+		}
+	}
 	//delete fd; // crashing
 }
 
@@ -23,11 +31,14 @@ bool MotionTracking::ProcessPair(struct StereoPair& frames, struct StereoPair& f
 	for (int k = 0; k < 2; k++)
 	{
 		// remove keypoints scheduled for deletion
+		//for (vector<KeyPointEx*>::reverse_iterator it = kpx[k].rbegin(); it < kpx[k].rend();)
 		for (vector<KeyPointEx*>::iterator it = kpx[k].begin(); it < kpx[k].end();)
 		{
 			if ((*it)->scheduledDelete)
 			{
 				delete *it;
+				//kpx[k].erase(--(it.base()));
+				//++it;
 				it = kpx[k].erase(it);
 			}
 			else
