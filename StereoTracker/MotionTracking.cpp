@@ -47,8 +47,7 @@ MotionTracking::~MotionTracking(void)
 bool MotionTracking::ProcessPair(struct StereoPair& frames, struct StereoPair& fg_mask)
 {
 	// for left & right frame
-	//for (int k = 0; k < 2; k++)
-	for (int k = 0; k < 1; k++)
+	for (int k = 0; k < 2; k++)
 	{
 		// remove keypoints scheduled for deletion
 		for (vector<KeyPointEx*>::iterator it = kpx[k].begin(); it < kpx[k].end();)
@@ -69,6 +68,7 @@ bool MotionTracking::ProcessPair(struct StereoPair& frames, struct StereoPair& f
 		{
 			vector<KeyPoint> new_kp;
 			vector<KeyPointEx*> new_kpx;
+			new_kpx.clear();
 			fd->detect(frames.frames[k], new_kp, fg_mask.frames[k]);
 
 			// add new unique keypoints; O(N^K)!
@@ -81,14 +81,19 @@ bool MotionTracking::ProcessPair(struct StereoPair& frames, struct StereoPair& f
 				}
 				else
 				{
+					bool unique = true;
 					for(vector<KeyPointEx*>::iterator it2 = kpx[k].begin(); it2 != kpx[k].end(); ++it2)
 					{
 						//if (it->pt.x != (*it2)->pt.x || it->pt.y != (*it2)->pt.y) // round?
-						if (!(*it2)->sameAs(*it))
+						//if ((*it2)->sameAs(*it))
+						if ((*it2)->similiarAs(*it))
 						{
-							new_kpx.push_back(new KeyPointEx(*it));
+							unique = false;
+							break;
 						}
 					}
+					if (unique)
+						new_kpx.push_back(new KeyPointEx(*it));
 				}
 			}
 
@@ -132,19 +137,23 @@ bool MotionTracking::ProcessPair(struct StereoPair& frames, struct StereoPair& f
 		// find duplicates and schedule removal
 		if (frame_number % 3 == 0) // not always
 		{
-			for(vector<KeyPointEx*>::iterator it = kpx[k].begin(); it != kpx[k].end() - 1; ++it)
+			if (kpx[k].size() != 0)
 			{
-				if ((*it)->scheduledDelete)
-					continue;
-
-				for(vector<KeyPointEx*>::iterator it2 = it + 1; it2 != kpx[k].end(); ++it2)
+				for(vector<KeyPointEx*>::iterator it = kpx[k].begin(); it < kpx[k].end() - 1; ++it)
 				{
-					if ((*it2)->scheduledDelete)
+					if ((*it)->scheduledDelete)
 						continue;
 
-					if ((*it)->sameAs(**it2))
+					for(vector<KeyPointEx*>::iterator it2 = it + 1; it2 < kpx[k].end(); ++it2)
 					{
-						(*it2)->scheduledDelete = true;
+						if ((*it2)->scheduledDelete)
+							continue;
+
+						//if ((*it)->sameAs(**it2))
+						if ((*it)->similiarAs(**it2))
+						{
+							(*it2)->scheduledDelete = true;
+						}
 					}
 				}
 			}

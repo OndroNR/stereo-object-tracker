@@ -1,6 +1,8 @@
 #pragma once
 
+#include <math.h>
 #include "common.h"
+
 
 using namespace cv;
 
@@ -37,6 +39,14 @@ public:
 	bool sameAs(KeyPointEx& kp)
 	{
 		return this->pt.x == kp.pt.x && this->pt.y == kp.pt.y;
+	}
+	bool similiarAs(KeyPoint& kp)
+	{
+		return (std::abs(this->pt.x - kp.pt.x) + std::abs(this->pt.y - kp.pt.y)) < 10.0;
+	}
+	bool similiarAs(KeyPointEx& kp)
+	{
+		return (std::abs(this->pt.x - kp.pt.x) + std::abs(this->pt.y - kp.pt.y)) < 10.0;
 	}
     static void convert(const vector<KeyPointEx*>& keypoints,
                         CV_OUT vector<Point2f>& points2f,

@@ -239,24 +239,35 @@ int main( int argc, char** argv )
 						//drawKeypoints(remap.frames[0], mt.kpx[0], remap_kp.frames[0]);
 						//drawKeypoints(remap.frames[0], dynamic_cast<vector<KeyPoint>>(mt.kpx[0]), remap_kp.frames[0]);
 
-						remap.frames[0].copyTo( remap_kp.frames[0] ); 
-						vector<KeyPointEx*>::const_iterator it = mt.kpx[0].begin(),
-														 end = mt.kpx[0].end();
-						RNG& rng=theRNG();
-						for( ; it != end; ++it )
+						for (int k = 0; k < 2; k++)
 						{
-							Scalar color = Scalar(rng(256), rng(256), rng(256));
-							_drawKeypoint( remap_kp.frames[0], **it, color, DrawMatchesFlags::DEFAULT );
+							remap.frames[k].copyTo( remap_kp.frames[k] );
+							if (mt.kpx[k].size() == 0)
+								continue;
+
+							vector<KeyPointEx*>::const_iterator it = mt.kpx[k].begin(),
+															 end = mt.kpx[k].end();
+							RNG& rng=theRNG();
+							for( ; it != end; ++it )
+							{
+								Scalar color = Scalar(rng(256), rng(256), rng(256));
+								_drawKeypoint( remap_kp.frames[k], **it, color, DrawMatchesFlags::DEFAULT );
+							}
 						}
 					
-						imshow("Keypoints", remap_kp.frames[0]);
-						//imshow("Keypoints", sideBySideMat(remap_kp.frames[0], remap_kp.frames[1]));
+						//imshow("Keypoints", remap_kp.frames[0]);
+						imshow("Keypoints", sideBySideMat(remap_kp.frames[0], remap_kp.frames[1]));
+
+						
 					}
 
 					fps.update();
 					counter++;
 					if (counter % 10 == 0)
+					{
+						cout << "Current keypoint count: " << mt.kpx[0].size() << "; " << mt.kpx[1].size() << endl;
 						std::cout << "Processing fps: " << fps.get() << endl;
+					}
 
 					int key = waitKey(5);
 					if(key >= 0)
@@ -268,6 +279,7 @@ int main( int argc, char** argv )
 				cv::destroyWindow("Input pair");
 				cv::destroyWindow("Remapped pair");
 				cv::destroyWindow("Foreground mask");
+				cv::destroyWindow("Keypoints");
 				break;
 			}
 		case 'q':
