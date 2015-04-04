@@ -7,6 +7,7 @@
 #include "StereoPreprocessing.h"
 #include "BackgroundProcessing.h"
 #include "MotionTracking.h"
+#include "StereoReconstruction.h"
 #include "Fps.h"
 
 using namespace cv;
@@ -213,6 +214,9 @@ int main( int argc, char** argv )
 
 				MotionTracking mt;
 
+				StereoReconstruction sr;
+				
+
 				bool has_fg = false;
 
 
@@ -237,6 +241,8 @@ int main( int argc, char** argv )
 					else
 					{
 						mt.ProcessPair(remap, fgMaskMOG2);
+
+						sr.Process(mt.kpx, remap);
 
 						//drawKeypoints(remap.frames[0], mt.kpx[0], remap_kp.frames[0]);
 						//drawKeypoints(remap.frames[0], dynamic_cast<vector<KeyPoint>>(mt.kpx[0]), remap_kp.frames[0]);

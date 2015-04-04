@@ -1,5 +1,6 @@
 #include "KeyPointEx.h"
 
+// based on KeyPoint::convert
 void KeyPointEx::convert(const std::vector<KeyPointEx*>& keypoints, std::vector<Point2f>& points2f,
 						const vector<int>& keypointIndexes)
 {

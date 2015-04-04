@@ -83,10 +83,12 @@
     <ClCompile Include="BackgroundProcessing.cpp" />
     <ClCompile Include="common.cpp" />
     <ClCompile Include="KeyPointEx.cpp" />
+    <ClCompile Include="KeyPointPair.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MotionTracking.cpp" />
     <ClCompile Include="StereoCalibrate.cpp" />
     <ClCompile Include="StereoPreprocessing.cpp" />
+    <ClCompile Include="StereoReconstruction.cpp" />
     <ClCompile Include="StereoRecordInput.cpp" />
     <ClCompile Include="StereoVideoInput.cpp" />
   </ItemGroup>
@@ -96,9 +98,11 @@
     <ClInclude Include="Fps.h" />
     <ClInclude Include="Interval.h" />
     <ClInclude Include="KeyPointEx.h" />
+    <ClInclude Include="KeyPointPair.h" />
     <ClInclude Include="MotionTracking.h" />
     <ClInclude Include="StereoCalibrate.h" />
     <ClInclude Include="StereoPreprocessing.h" />
+    <ClInclude Include="StereoReconstruction.h" />
     <ClInclude Include="StereoRecordInput.h" />
     <ClInclude Include="StereoVideoInput.h" />
   </ItemGroup>

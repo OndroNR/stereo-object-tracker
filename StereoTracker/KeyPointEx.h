@@ -12,11 +12,13 @@ public:
 	bool scheduledDelete;
 	int unusedFor;
 	Point2f lastMove;
+	bool hasPair;
 	KeyPointEx() : KeyPoint()
 	{
 		lastMove = Point2f(0,0);
 		scheduledDelete = false;
 		unusedFor = 0;
+		hasPair = false;
 	}
 	KeyPointEx(KeyPoint& kp)
 	{
@@ -30,6 +32,7 @@ public:
 		lastMove = Point2f(0,0);
 		scheduledDelete = false;
 		unusedFor = 0;
+		hasPair = false;
 	}
 	bool sameAs(KeyPoint& kp)
 	{
