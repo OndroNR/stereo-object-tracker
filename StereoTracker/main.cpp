@@ -93,7 +93,9 @@ int main( int argc, char** argv )
 				delete svi;
 			}
 			//svi = new StereoRecordInput("f:\\galbavy\\data\\dp\\stereo\\150326-104514 kalibracia\\", "", "list.txt");
-			svi = new StereoRecordInput("f:\\galbavy\\data\\dp\\stereo\\150326-121755 kalibracia autofocus\\", "", "list.txt");
+			//svi = new StereoRecordInput("f:\\galbavy\\data\\dp\\stereo\\150326-121755 kalibracia autofocus\\", "", "list.txt");
+			svi = new StereoRecordInput("d:\\data\\dp\\stereo\\150326-115859 capture5\\", "", "list.txt");
+			//svi = new StereoRecordInput("d:\\data\\dp\\stereo\\150326-121755 kalibracia autofocus\\", "", "list.txt");
 			break;
 		case '2':
 			if (svi == NULL)
