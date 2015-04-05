@@ -22,8 +22,8 @@ float KeyPointPair::disparity()
 
 void KeyPointPair::scheduleDelete()
 {
-	kpx[0]->scheduledDelete = true;
-	kpx[1]->scheduledDelete = true;
+	kpx[0]->scheduledDelete = 5;
+	kpx[1]->scheduledDelete = 5;
 	scheduledDelete = true;
 }
 

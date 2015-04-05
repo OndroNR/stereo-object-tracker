@@ -36,6 +36,7 @@ bool MotionTracking::ProcessPair(struct StereoPair& frames, struct StereoPair& f
 		{
 			if ((*it)->scheduledDelete)
 			{
+				cout << "Deleting keypoint[" << k << "] Ptr = " << static_cast<void*>(*it) << ", reason: " << (*it)->scheduledDelete << endl;
 				delete *it;
 				//kpx[k].erase(--(it.base()));
 				//++it;
@@ -99,7 +100,7 @@ bool MotionTracking::ProcessPair(struct StereoPair& frames, struct StereoPair& f
 			{
 				if (status[i] == 0) // lost keypoint
 				{
-					kpx[k][i]->scheduledDelete = true;
+					kpx[k][i]->scheduledDelete = 2;
 				}
 				else
 				{
@@ -114,7 +115,7 @@ bool MotionTracking::ProcessPair(struct StereoPair& frames, struct StereoPair& f
 		{
 			if ((*it)->unusedFor >= 10)
 			{
-				(*it)->scheduledDelete = true;
+				(*it)->scheduledDelete = 3;
 			}
 		}
 
@@ -136,7 +137,7 @@ bool MotionTracking::ProcessPair(struct StereoPair& frames, struct StereoPair& f
 						//if ((*it)->sameAs(**it2))
 						if ((*it)->similiarAs(**it2))
 						{
-							(*it2)->scheduledDelete = true;
+							(*it2)->scheduledDelete = 4;
 						}
 					}
 				}

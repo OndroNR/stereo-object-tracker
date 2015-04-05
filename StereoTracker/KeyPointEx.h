@@ -9,7 +9,7 @@ class KeyPointEx :
 	public cv::KeyPoint
 {
 public:
-	bool scheduledDelete;
+	short scheduledDelete;
 	int unusedFor;
 	Point2f lastMove;
 	bool hasPair;

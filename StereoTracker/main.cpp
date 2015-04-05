@@ -227,9 +227,12 @@ int main( int argc, char** argv )
 
 				bool has_fg = false;
 
+				int frame_num = 0;
+
 
 				for (;;)
 				{
+					cout << endl << "Frame number: " << frame_num++ << endl;
 					struct StereoPair sp;
 					svi->GetNextPair(sp);
 					imshow("Input pair", sideBySideMat(sp.frames[0], sp.frames[1]));
@@ -281,9 +284,11 @@ int main( int argc, char** argv )
 					counter++;
 					if (counter % 10 == 0)
 					{
-						cout << "Current keypoint count: " << mt.kpx[0].size() << "; " << mt.kpx[1].size() << endl;
+						
 						std::cout << "Processing fps: " << fps.get() << endl;
 					}
+					cout << "Current keypoint count: " << mt.kpx[0].size() << "; " << mt.kpx[1].size() << endl;
+					cout << "Current pairs count: " << sr.pairs.size() << endl;
 
 					int key = waitKey(5);
 					if(key >= 0)

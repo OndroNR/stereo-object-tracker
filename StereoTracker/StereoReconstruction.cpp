@@ -27,6 +27,7 @@ bool StereoReconstruction::Process(vector<KeyPointEx*> kpx[2], StereoPair& frame
 			// delete invalidated pairs
 			if ((*it)->scheduledDelete)
 			{
+				cout << "Deleting pair, Ptr = " << static_cast<void*>(*it) << endl;
 				delete *it;
 				it = pairs.erase(it);
 			}
@@ -35,6 +36,11 @@ bool StereoReconstruction::Process(vector<KeyPointEx*> kpx[2], StereoPair& frame
 				// invalidate pairs with invalidated keypoint(s)
 				if ( (*it)->kpx[0]->scheduledDelete || (*it)->kpx[1]->scheduledDelete)
 				{
+					if ((*it)->kpx[0]->scheduledDelete)
+						cout << "KP[0], Ptr " << static_cast<void*>((*it)->kpx[0]) << " is scheduled for delete" << endl;
+					if ((*it)->kpx[1]->scheduledDelete)
+						cout << "KP[1], Ptr " << static_cast<void*>((*it)->kpx[1]) << " is scheduled for delete" << endl;
+					cout << "Scheduling pair, Ptr = " << static_cast<void*>(*it) << ", KPX[0] = " << static_cast<void*>((*it)->kpx[0]) << ", KPX[1] = " << static_cast<void*>((*it)->kpx[1]) << endl;
 					(*it)->scheduleDelete();
 				}
 				else
@@ -85,6 +91,9 @@ bool StereoReconstruction::Process(vector<KeyPointEx*> kpx[2], StereoPair& frame
 		{
 			vector<DMatch> matches;
 			matcher->match(descriptors[0], descriptors[1], matches);
+
+			// best matches first
+			sort(matches.begin(), matches.end());
 		
 			for(vector<DMatch>::iterator match = matches.begin(); match < matches.end() - 1; ++match)
 			{
@@ -100,6 +109,22 @@ bool StereoReconstruction::Process(vector<KeyPointEx*> kpx[2], StereoPair& frame
 					// TODO: - check na suladny pohyb - nesmie byt prilis rozdielny
 					// gain * deltaAngle + gain deltaVecSize
 
+				}
+
+				if (kp_direct_kpx[0][match->queryIdx]->hasPair)
+				{
+					cout << "KP[0], Ptr " << static_cast<void*>(kp_direct_kpx[0][match->queryIdx]) << " is already used!!!" << endl;
+				}
+
+				if (kp_direct_kpx[1][match->trainIdx]->hasPair)
+				{
+					cout << "KP[1], Ptr " << static_cast<void*>(kp_direct_kpx[1][match->trainIdx]) << " is already used!!!" << endl;
+				}
+
+				// Do not allow keypoint duplicate use (problems, later crashing)
+				if (kp_direct_kpx[0][match->queryIdx]->hasPair || kp_direct_kpx[1][match->trainIdx]->hasPair)
+				{
+					continue;
 				}
 
 				kp_direct_matched[0][match->queryIdx] = true;
