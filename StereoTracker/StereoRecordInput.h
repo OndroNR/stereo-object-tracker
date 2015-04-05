@@ -1,6 +1,6 @@
 #pragma once
 #include "common.h"
-#include "stereovideoinput.h"
+#include "StereoVideoInput.h"
 #include <iostream>
 #include <fstream>
 #include <string>

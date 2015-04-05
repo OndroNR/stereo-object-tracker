@@ -1,5 +1,5 @@
 // Source: http://noobtuts.com/cpp/interval
-#include <windows.h>
+#include <sys/time.h>
 
 class Interval
 {
@@ -17,5 +17,12 @@ public:
     inline unsigned int value() const 
     {
         return GetTickCount() - initial_;
+    }
+    unsigned GetTickCount() const
+    {
+        struct timeval tv;
+        if (gettimeofday(&tv, NULL) != 0)
+            return 0;
+        return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
     }
 };

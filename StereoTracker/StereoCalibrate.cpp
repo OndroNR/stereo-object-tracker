@@ -23,8 +23,8 @@ StereoCalibrate::~StereoCalibrate(void)
 // base on OpenCV C++ sample stereo_calib
 void StereoCalibrate::calibrate(bool showImages)
 {
-	vector<vector<Point2f>> imagePoints[2];
-    vector<vector<Point3f>> objectPoints;
+	vector<vector<Point2f> > imagePoints[2];
+    vector<vector<Point3f> > objectPoints;
     Size image_size;
 	int chessboard_count = 0;
 	int frame_no = 0;

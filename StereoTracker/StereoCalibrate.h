@@ -3,6 +3,7 @@
 #include "common.h"
 #include "opencv2/calib3d/calib3d.hpp"
 #include <vector>
+#include <stdexcept>
 
 using namespace cv;
 
@@ -19,6 +20,6 @@ public:
 	~StereoCalibrate(void);
 	void calibrate(bool showImages);
 	bool isCalibrated();
-	StereoCalibration* StereoCalibrate::getCalibrationParams();
+	StereoCalibration* getCalibrationParams();
 };
 
