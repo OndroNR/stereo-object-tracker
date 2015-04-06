@@ -1,5 +1,9 @@
 // Source: http://noobtuts.com/cpp/interval
+#ifdef _WIN32
+#include <windows.h>
+#elif
 #include <sys/time.h>
+#endif
 
 class Interval
 {
@@ -18,6 +22,7 @@ public:
     {
         return GetTickCount() - initial_;
     }
+	#ifndef _WIN32
     unsigned GetTickCount() const
     {
         struct timeval tv;
@@ -25,4 +30,5 @@ public:
             return 0;
         return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
     }
+	#endif
 };

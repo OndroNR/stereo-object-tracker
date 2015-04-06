@@ -31,15 +31,12 @@ bool MotionTracking::ProcessPair(struct StereoPair& frames, struct StereoPair& f
 	for (int k = 0; k < 2; k++)
 	{
 		// remove keypoints scheduled for deletion
-		//for (vector<KeyPointEx*>::reverse_iterator it = kpx[k].rbegin(); it < kpx[k].rend();)
 		for (vector<KeyPointEx*>::iterator it = kpx[k].begin(); it < kpx[k].end();)
 		{
 			if ((*it)->scheduledDelete)
 			{
-				cout << "Deleting keypoint[" << k << "] Ptr = " << static_cast<void*>(*it) << ", reason: " << (*it)->scheduledDelete << endl;
+				//cout << "Deleting keypoint[" << k << "] Ptr = " << static_cast<void*>(*it) << ", reason: " << (*it)->scheduledDelete << endl;
 				delete *it;
-				//kpx[k].erase(--(it.base()));
-				//++it;
 				it = kpx[k].erase(it);
 			}
 			else
@@ -100,7 +97,7 @@ bool MotionTracking::ProcessPair(struct StereoPair& frames, struct StereoPair& f
 			{
 				if (status[i] == 0) // lost keypoint
 				{
-					kpx[k][i]->scheduledDelete = 2;
+					kpx[k][i]->scheduledDelete = KPX_REASON_LOST_TRACKING;
 				}
 				else
 				{
@@ -115,7 +112,7 @@ bool MotionTracking::ProcessPair(struct StereoPair& frames, struct StereoPair& f
 		{
 			if ((*it)->unusedFor >= 10)
 			{
-				(*it)->scheduledDelete = 3;
+				(*it)->scheduledDelete = KPX_REASON_UNUSED;
 			}
 		}
 
@@ -137,7 +134,7 @@ bool MotionTracking::ProcessPair(struct StereoPair& frames, struct StereoPair& f
 						//if ((*it)->sameAs(**it2))
 						if ((*it)->similiarAs(**it2))
 						{
-							(*it2)->scheduledDelete = 4;
+							(*it2)->scheduledDelete = KPX_REASON_DUPLICATE;
 						}
 					}
 				}

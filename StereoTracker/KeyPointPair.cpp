@@ -1,4 +1,5 @@
 #include "KeyPointPair.h"
+#include "MotionTracking.h"
 
 Mat KeyPointPair::Q;
 
@@ -22,8 +23,8 @@ float KeyPointPair::disparity()
 
 void KeyPointPair::scheduleDelete()
 {
-	kpx[0]->scheduledDelete = 5;
-	kpx[1]->scheduledDelete = 5;
+	kpx[0]->scheduledDelete = KPX_REASON_PAIR_DELETE;
+	kpx[1]->scheduledDelete = KPX_REASON_PAIR_DELETE;
 	scheduledDelete = true;
 }
 
