@@ -131,7 +131,9 @@ int main( int argc, char** argv )
 
 			if (sc != NULL)
 				delete sc;
-			sc = new StereoCalibrate(svi, Size(10, 7), 2.4f); // 10x7 squares, 2.4cm square size
+			sc = new StereoCalibrate(svi,
+				Size(ConfigStore::get().getInt("calibration_pattern.cols"), ConfigStore::get().getInt("calibration_pattern.rows")),
+				ConfigStore::get().getFloat("calibration_pattern.square_size")); // 10x7 squares, 2.4cm square size
 			sc->calibrate(true);
 
 			if (sc->isCalibrated())

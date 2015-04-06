@@ -8,6 +8,10 @@ MotionTracking::MotionTracking(void)
 	frame_number = 0;
 	//fd = new GoodFeaturesToTrackDetector(100);
 	fd = new FastFeatureDetector();
+
+	unused_keypoint_frame_limit = ConfigStore::get().getInt("mt.unused_keypoint_frame_limit");
+	keypoint_detect_rate = ConfigStore::get().getInt("mt.keypoint_detect_rate");
+	duplicate_removal_rate = ConfigStore::get().getInt("mt.duplicate_removal_rate");
 }
 
 
@@ -46,7 +50,7 @@ bool MotionTracking::ProcessPair(struct StereoPair& frames, struct StereoPair& f
 		}
 
 		// reinitialisation - find new keypoints
-		if (frame_number % 10 == 0) // sometime
+		if (frame_number % keypoint_detect_rate == 0) // sometime
 		{
 			vector<KeyPoint> new_kp;
 			vector<KeyPointEx*> new_kpx;
@@ -110,14 +114,14 @@ bool MotionTracking::ProcessPair(struct StereoPair& frames, struct StereoPair& f
 		// schedule unused keypoints for deletion
 		for (vector<KeyPointEx*>::iterator it = kpx[k].begin(); it < kpx[k].end(); ++it)
 		{
-			if ((*it)->unusedFor >= 10)
+			if ((*it)->unusedFor >= unused_keypoint_frame_limit)
 			{
 				(*it)->scheduledDelete = KPX_REASON_UNUSED;
 			}
 		}
 
 		// find duplicates and schedule removal
-		if (frame_number % 3 == 0) // not always
+		if (frame_number % duplicate_removal_rate == 0) // not always
 		{
 			if (kpx[k].size() != 0)
 			{

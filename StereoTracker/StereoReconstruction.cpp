@@ -5,6 +5,10 @@ StereoReconstruction::StereoReconstruction(void)
 {
 	extractor = new SiftDescriptorExtractor();
 	matcher = new BFMatcher();
+	line_filter_enabled = ConfigStore::get().getInt("sr.line_filter_enabled") > 0;
+	line_filter_limit = ConfigStore::get().getInt("sr.line_filter_limit");
+	same_movement_filter_enabled = ConfigStore::get().getInt("sr.same_movement_filter_enabled") > 0;
+	regular_check_pair_validity = ConfigStore::get().getInt("sr.regular_check_pair_validity") > 0;
 }
 
 
@@ -54,6 +58,7 @@ bool StereoReconstruction::Process(vector<KeyPointEx*> kpx[2], StereoPair& frame
 		}
 
 		// TODO: kontrola parov, ci este sedia ak neboli skontrolovane po N framoch. Ak nesedie, scheduleDelete na KPP aj KPX[2]
+		// regular_check_pair_validity
 		//for (vector<KeyPointPair*>::iterator it = pairs.begin(); it < pairs.end(); ++it)
 		//{
 		//	if ( (*it)->uncheckedFor > 10 )
@@ -97,14 +102,14 @@ bool StereoReconstruction::Process(vector<KeyPointEx*> kpx[2], StereoPair& frame
 		
 			for(vector<DMatch>::iterator match = matches.begin(); match < matches.end() - 1; ++match)
 			{
-				if (true) // line filter
+				if (line_filter_enabled) // line filter
 				{
 					float line_diff = abs(kp_direct_kpx[0][match->queryIdx]->pt.y - kp_direct_kpx[1][match->trainIdx]->pt.y);
-					if (line_diff > 2)
+					if (line_diff > line_filter_limit)
 						continue;
 				}
 
-				if (true) // same movement
+				if (same_movement_filter_enabled) // same movement
 				{
 					// TODO: - check na suladny pohyb - nesmie byt prilis rozdielny
 					// gain * deltaAngle + gain deltaVecSize

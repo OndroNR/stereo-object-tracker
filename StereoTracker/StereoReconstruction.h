@@ -4,6 +4,7 @@
 #include "opencv2/nonfree/features2d.hpp"
 #include "KeyPointEx.h"
 #include "KeyPointPair.h"
+#include "ConfigStore.h"
 
 class StereoReconstruction
 {
@@ -15,5 +16,9 @@ public:
 	vector<KeyPointPair*> pairs;
 	int frame_number;
 	bool Process(vector<KeyPointEx*> kpx[2], StereoPair& frames);
+	bool line_filter_enabled;
+	int line_filter_limit;
+	bool same_movement_filter_enabled;
+	bool regular_check_pair_validity;
 };
 

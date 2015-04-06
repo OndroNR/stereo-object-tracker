@@ -2,6 +2,7 @@
 
 #include "common.h"
 #include "KeyPointEx.h"
+#include "ConfigStore.h"
 
 using namespace cv;
 
@@ -21,4 +22,7 @@ public:
 	int frame_number;
 	Ptr<FeatureDetector> fd;
 	StereoPair oldFrames;
+	int unused_keypoint_frame_limit;
+	int keypoint_detect_rate;
+	int duplicate_removal_rate;
 };
