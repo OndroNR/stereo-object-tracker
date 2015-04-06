@@ -7,6 +7,7 @@
 #include "common.h"
 #include <opencv2/opencv.hpp>
 #include <iostream>
+#include "ConfigStore.h"
 #include "StereoVideoInput.h"
 #include "StereoRecordInput.h"
 #include "StereoCalibrate.h"
@@ -30,6 +31,7 @@ void showMenu()
 	cout << "5 - play video\n";
 	cout << "6 - reset stream\n";
 	cout << "7 - play remapped + bg subtraction\n";
+	cout << "0 - reload config\n";
 	cout << "q - quit\n";
 	cout << "Select command: ";
 }
@@ -72,10 +74,28 @@ static inline void _drawKeypoint( Mat& img, const KeyPoint& p, const Scalar& col
         int radius = 3 * draw_multiplier;
         circle( img, center, radius, color, 1, CV_AA, draw_shift_bits );
     }
-} 
+}
+
+bool loadConfig()
+{
+	std::ifstream configInput("config.txt");
+	if (!configInput)
+	{
+		cerr << "Failed to open config file!" << endl;
+		return false;
+	}
+	ConfigStore::get().parseFile(configInput);
+	configInput.close();	
+	return true;
+}
 
 int main( int argc, char** argv )
 {
+	if (!loadConfig())
+	{
+		return 1;
+	}
+
 	bool quit = false;
 	char menu_cmd = '%'; // nothing
 
@@ -99,11 +119,8 @@ int main( int argc, char** argv )
 			{
 				delete svi;
 			}
-			//svi = new StereoRecordInput("f:\\galbavy\\data\\dp\\stereo\\150326-104514 kalibracia\\", "", "list.txt");
-			//svi = new StereoRecordInput("f:\\galbavy\\data\\dp\\stereo\\150326-121755 kalibracia autofocus\\", "", "list.txt");
-			svi = new StereoRecordInput("d:\\data\\dp\\stereo\\150326-115859 capture5\\", "", "list.txt");
-			//svi = new StereoRecordInput("/media/ondrej/VGG/galbavy/data/dp/stereo/150326-115859 capture5/", "", "list.txt");
-			//svi = new StereoRecordInput("d:\\data\\dp\\stereo\\150326-121755 kalibracia autofocus\\", "", "list.txt");
+			svi = new StereoRecordInput(ConfigStore::get().getString("sri.path"), ConfigStore::get().getString("sri.frams_subpath"), ConfigStore::get().getString("sri.list_filename"));
+			
 			break;
 		case '2':
 			if (svi == NULL)
@@ -136,7 +153,7 @@ int main( int argc, char** argv )
 			}
 
 			scp = sc->getCalibrationParams();
-			fs = FileStorage("stereo_calibration.xml", FileStorage::WRITE);
+			fs = FileStorage(ConfigStore::get().getString("stereo_calibration_path"), FileStorage::WRITE);
 			fs << "stereo_calibration" << *scp;
 			fs.release();
 			cout << "Calibration saved" << endl;
@@ -144,7 +161,7 @@ int main( int argc, char** argv )
 			break;
 		case '4':
 			fs = FileStorage();
-			fs.open("stereo_calibration.xml", FileStorage::READ);
+			fs.open(ConfigStore::get().getString("stereo_calibration_path"), FileStorage::READ);
 
 			if (!fs.isOpened())
 			{
@@ -304,6 +321,12 @@ int main( int argc, char** argv )
 				cv::destroyWindow("Keypoints");
 				break;
 			}
+		case '0':
+			if (loadConfig())
+			{
+				cout << "Config reloaded" << endl;
+			}
+			break;
 		case 'q':
 		case 'Q':
 			quit = true;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <string>
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
 
@@ -87,3 +88,13 @@ struct RectificationParams
 cv::Mat sideBySideMat(cv::Mat a, cv::Mat b);
 void write(FileStorage& fs, const std::string&, const StereoCalibration& x);
 void read(const FileNode& node, StereoCalibration& x, const StereoCalibration& default_value = StereoCalibration());
+
+std::string trim_right_copy(
+	const std::string& s,
+	const std::string& delimiters = " \f\n\r\t\v" );
+std::string trim_left_copy(
+	const std::string& s,
+	const std::string& delimiters = " \f\n\r\t\v" );
+std::string trim_copy(
+	const std::string& s,
+	const std::string& delimiters = " \f\n\r\t\v" );

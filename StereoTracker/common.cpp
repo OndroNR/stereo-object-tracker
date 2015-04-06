@@ -50,3 +50,32 @@ ostream& operator<<(ostream& out, const StereoCalibration& d)
 	cout << "avg_reprojection_error = " << d.avg_reprojection_error << endl << endl;
     return out;
 }
+
+
+// string trim http://www.cplusplus.com/faq/sequences/strings/trim/
+std::string trim_right_copy(
+	const std::string& s,
+	const std::string& delimiters )
+{
+	if (s.empty())
+		return s;
+	return s.substr( 0, s.find_last_not_of( delimiters ) + 1 );
+}
+
+std::string trim_left_copy(
+	const std::string& s,
+	const std::string& delimiters )
+{
+	if (s.empty())
+		return s;
+	return s.substr( s.find_first_not_of( delimiters ) );
+}
+
+std::string trim_copy(
+	const std::string& s,
+	const std::string& delimiters )
+{
+	if (s.empty())
+		return s;
+	return trim_left_copy( trim_right_copy( s, delimiters ), delimiters );
+}
