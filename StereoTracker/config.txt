@@ -21,6 +21,9 @@ calibration_pattern.square_size = 2.4
 # stereo camera calibration
 stereo_calibration_path = stereo_calibration.xml
 
+# world calibration depends on this value!
+stereo_rectify_alpha = 0.7
+
 # MotionTracking
 mt.keypoint_detect_rate = 10
 mt.unused_keypoint_frame_limit = 10

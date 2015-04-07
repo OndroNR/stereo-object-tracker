@@ -206,7 +206,7 @@ int main( int argc, char** argv )
 
 				StereoPair remap;
 
-				StereoPreprocessing stereoPrep(scp, frameSize, 1);
+				StereoPreprocessing stereoPrep(scp, frameSize, ConfigStore::get().getFloat("stereo_rectify_alpha"));
 
 				BackgroundProcessing bgProc;
 				StereoPair fgMaskMOG2;
