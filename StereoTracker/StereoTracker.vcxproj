@@ -88,11 +88,13 @@
     <ClCompile Include="KeyPointPair.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MotionTracking.cpp" />
+    <ClCompile Include="PointPicker.cpp" />
     <ClCompile Include="StereoCalibrate.cpp" />
     <ClCompile Include="StereoPreprocessing.cpp" />
     <ClCompile Include="StereoReconstruction.cpp" />
     <ClCompile Include="StereoRecordInput.cpp" />
     <ClCompile Include="StereoVideoInput.cpp" />
+    <ClCompile Include="WorldCalibration.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BackgroundProcessing.h" />
@@ -103,11 +105,13 @@
     <ClInclude Include="KeyPointEx.h" />
     <ClInclude Include="KeyPointPair.h" />
     <ClInclude Include="MotionTracking.h" />
+    <ClInclude Include="PointPicker.h" />
     <ClInclude Include="StereoCalibrate.h" />
     <ClInclude Include="StereoPreprocessing.h" />
     <ClInclude Include="StereoReconstruction.h" />
     <ClInclude Include="StereoRecordInput.h" />
     <ClInclude Include="StereoVideoInput.h" />
+    <ClInclude Include="WorldCalibration.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

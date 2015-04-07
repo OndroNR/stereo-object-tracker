@@ -15,6 +15,7 @@
 #include "BackgroundProcessing.h"
 #include "MotionTracking.h"
 #include "StereoReconstruction.h"
+#include "WorldCalibration.h"
 #include "Fps.h"
 
 using namespace cv;
@@ -31,6 +32,9 @@ void showMenu()
 	cout << "5 - play video\n";
 	cout << "6 - reset stream\n";
 	cout << "7 - play remapped + bg subtraction\n";
+	cout << "8 - calibrate world\n";
+	cout << "p - save world calibration\n";
+	cout << "o - load world calibration\n";
 	cout << "0 - reload config\n";
 	cout << "q - quit\n";
 	cout << "Select command: ";
@@ -62,6 +66,7 @@ int main( int argc, char** argv )
 	StereoVideoInput* svi = NULL;
 	StereoCalibrate* sc = NULL;
 	StereoCalibration* scp = NULL;
+	WorldCalibration* wc = new WorldCalibration();
 	FileStorage fs;
 	Fps fps;
 	int counter = 0;
@@ -172,6 +177,12 @@ int main( int argc, char** argv )
 			cv::destroyWindow("Input pair");
 			break;
 		case '6':
+			if (svi == NULL)
+			{
+				cout << "Stereo stream not loaded";
+				break;
+			}
+
 			if (svi != NULL)
 				svi->Reset();
 
@@ -267,10 +278,21 @@ int main( int argc, char** argv )
 							//putText(keypoints, to_string((int)sr.pairs[i]->pt.z).c_str(), pt, FONT_HERSHEY_PLAIN, 0.7, Scalar(255,255,255));
 						}
 
+						vector<Point3f> camPoints;
+						vector<Point3f> worldCalibratedPoints;
+						if (sr.pairs.size() > 0)
+						{
+							for (size_t i = 0; i < sr.pairs.size(); i++)
+							{
+								camPoints.push_back(sr.pairs[i]->pt);
+							}
+							worldCalibratedPoints = wc->transform(camPoints);
+						}
+
 						// write ply
 						ofstream ply_file(("ply" + to_string(counter) + ".ply").c_str());
 						ply_file << "ply\nformat ascii 1.0\n";
-						ply_file << "element vertex " << to_string(sr.pairs.size()*2) << "\n";
+						ply_file << "element vertex " << to_string(sr.pairs.size()*3) << "\n";
 						ply_file << "property float x\nproperty float y\nproperty float z\n";
 						ply_file << "property uchar red\nproperty uchar green\nproperty uchar blue\n";
 						ply_file << "end_header\n";
@@ -278,9 +300,11 @@ int main( int argc, char** argv )
 						for (size_t i = 0; i < sr.pairs.size(); i++)
 						{
 							KeyPointPair kpp = *sr.pairs[i];
+							Point3f worldPoint = worldCalibratedPoints[i];
 
 							ply_file << to_string(kpp.kpx[0]->pt.x) << " " << to_string(kpp.kpx[0]->pt.y) << " " << to_string(kpp.pt.z) << " 255 0 0\n";
 							ply_file << to_string(kpp.pt.x) << " " << to_string(kpp.pt.y) << " " << to_string(kpp.pt.z) << " 0 255 0\n";
+							ply_file << to_string(worldPoint.x) << " " << to_string(worldPoint.y) << " " << to_string(worldPoint.z) << " 0 0 255\n";
 						}
 						ply_file.close();
 
@@ -313,6 +337,78 @@ int main( int argc, char** argv )
 				cv::destroyWindow("Keypoints");
 				break;
 			}
+		case '8':
+			{
+				if (svi == NULL)
+				{
+					cout << "Stereo stream not loaded";
+					break;
+				}
+
+				if (scp == NULL)
+				{
+					cout << "Calibration missing";
+					break;
+				}
+
+				StereoPair remap;
+				StereoPreprocessing stereoPrep(scp, frameSize, 1);
+				KeyPointPair::Q = stereoPrep.rp->Q;
+
+				struct StereoPair sp;
+				svi->GetNextPair(sp);
+				stereoPrep.ProcessPair(sp, remap);
+				imshow("Remapped pair", sideBySideMat(remap.frames[0], remap.frames[1]));
+
+				wc->setPoints(remap);
+				wc->calcTransformationMatrix();
+				cout << "Transformation matrix = " << endl;
+				cout << wc->transformMatrix << endl << endl;
+
+				destroyWindow("Remapped pair");
+
+				cout << "Done" << endl;
+				break;
+			}
+		case 'o':
+		case 'O':
+			fs = FileStorage();
+			fs.open(ConfigStore::get().getString("world_calibration_path"), FileStorage::READ);
+
+			if (!fs.isOpened())
+			{
+				cerr << "Failed to open world calibration file" << endl;
+				break;
+			}
+
+			fs["imagePoints0"] >> wc->imagePoints[0];
+			fs["imagePoints1"] >> wc->imagePoints[1];
+			fs["points0"] >> wc->points[0];
+			fs["points1"] >> wc->points[1];
+			fs["transformMatrix"] >> wc->transformMatrix;
+			fs.release();
+			cout << "World calibration loaded" << endl;
+
+			break;
+	
+		case 'p':
+		case 'P':
+			fs = FileStorage(ConfigStore::get().getString("world_calibration_path"), FileStorage::WRITE);
+			fs << "imagePoints0" << wc->imagePoints[0];
+			fs << "imagePoints1" << wc->imagePoints[1];
+			fs << "points0" << wc->points[0];
+			fs << "points1" << wc->points[1];
+			fs << "transformMatrix" << wc->transformMatrix;
+			fs.release();
+			cout << "World calibration saved" << endl;
+
+			break;
+
+
+
+
+
+
 		case '0':
 			if (loadConfig())
 			{
