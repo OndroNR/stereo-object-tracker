@@ -86,6 +86,7 @@ struct RectificationParams
 };
 
 cv::Mat sideBySideMat(cv::Mat a, cv::Mat b);
+void setLabel(cv::Mat& im, const std::string label, const cv::Point & or);
 void write(FileStorage& fs, const std::string&, const StereoCalibration& x);
 void read(const FileNode& node, StereoCalibration& x, const StereoCalibration& default_value = StereoCalibration());
 
@@ -98,3 +99,5 @@ std::string trim_left_copy(
 std::string trim_copy(
 	const std::string& s,
 	const std::string& delimiters = " \f\n\r\t\v" );
+
+void _drawKeypoint( Mat& img, const KeyPoint& p, const Scalar& color, int flags );

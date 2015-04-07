@@ -13,12 +13,15 @@ public:
 	int unusedFor;
 	Point2f lastMove;
 	bool hasPair;
+	Scalar color;
 	KeyPointEx() : KeyPoint()
 	{
 		lastMove = Point2f(0,0);
 		scheduledDelete = false;
 		unusedFor = 0;
 		hasPair = false;
+		RNG& rng = theRNG();
+		color = Scalar(rng(256), rng(256), rng(256));
 	}
 	KeyPointEx(KeyPoint& kp)
 	{
@@ -33,6 +36,8 @@ public:
 		scheduledDelete = false;
 		unusedFor = 0;
 		hasPair = false;
+		RNG& rng = theRNG();
+		color = Scalar(rng(256), rng(256), rng(256));
 	}
 	bool sameAs(KeyPoint& kp)
 	{
@@ -44,11 +49,19 @@ public:
 	}
 	bool similiarAs(KeyPoint& kp)
 	{
-		return (std::abs(this->pt.x - kp.pt.x) + std::abs(this->pt.y - kp.pt.y)) < 10.0;
+		return similiarAs(kp, 10.0);
 	}
 	bool similiarAs(KeyPointEx& kp)
 	{
-		return (std::abs(this->pt.x - kp.pt.x) + std::abs(this->pt.y - kp.pt.y)) < 10.0;
+		return similiarAs(kp, 10.0);
+	}
+	bool similiarAs(KeyPoint& kp, float limit)
+	{
+		return (std::abs(this->pt.x - kp.pt.x) + std::abs(this->pt.y - kp.pt.y)) < limit;
+	}
+	bool similiarAs(KeyPointEx& kp, float limit)
+	{
+		return (std::abs(this->pt.x - kp.pt.x) + std::abs(this->pt.y - kp.pt.y)) < limit;
 	}
     static void convert(const vector<KeyPointEx*>& keypoints,
                         CV_OUT vector<Point2f>& points2f,

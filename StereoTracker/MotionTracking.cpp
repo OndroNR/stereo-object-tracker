@@ -12,6 +12,7 @@ MotionTracking::MotionTracking(void)
 	unused_keypoint_frame_limit = ConfigStore::get().getInt("mt.unused_keypoint_frame_limit");
 	keypoint_detect_rate = ConfigStore::get().getInt("mt.keypoint_detect_rate");
 	duplicate_removal_rate = ConfigStore::get().getInt("mt.duplicate_removal_rate");
+	similiar_as_limit = ConfigStore::get().getFloat("mt.similiar_as_limit");
 }
 
 
@@ -72,7 +73,7 @@ bool MotionTracking::ProcessPair(struct StereoPair& frames, struct StereoPair& f
 					{
 						//if (it->pt.x != (*it2)->pt.x || it->pt.y != (*it2)->pt.y) // round?
 						//if ((*it2)->sameAs(*it))
-						if ((*it2)->similiarAs(*it))
+						if ((*it2)->similiarAs(*it, similiar_as_limit))
 						{
 							unique = false;
 							break;
@@ -136,7 +137,7 @@ bool MotionTracking::ProcessPair(struct StereoPair& frames, struct StereoPair& f
 							continue;
 
 						//if ((*it)->sameAs(**it2))
-						if ((*it)->similiarAs(**it2))
+						if ((*it)->similiarAs(**it2, similiar_as_limit))
 						{
 							(*it2)->scheduledDelete = KPX_REASON_DUPLICATE;
 						}

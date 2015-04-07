@@ -245,3 +245,7 @@ FakesAssemblies/
 # sftp configuration file
 sftp-config.json
 
+
+
+# custom
+*.ply

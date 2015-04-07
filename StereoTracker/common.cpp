@@ -20,6 +20,20 @@ Mat sideBySideMat(Mat a, Mat b)
 	return out;
 }
 
+// http://answers.opencv.org/question/27695/puttext-with-black-background/
+void setLabel(cv::Mat& im, const std::string label, const cv::Point & or)
+{
+	int fontface = cv::FONT_HERSHEY_SIMPLEX;
+	double scale = 0.4;
+	int thickness = 1;
+	int baseline = 0;
+
+	cv::Size text = cv::getTextSize(label, fontface, scale, thickness, &baseline);
+	cv::rectangle(im, or + cv::Point(0, baseline), or + cv::Point(text.width, -text.height), CV_RGB(0,0,0), CV_FILLED);
+	cv::putText(im, label, or, fontface, scale, CV_RGB(255,255,255), thickness, 8);
+}
+
+// StereoCalibration class read/write functions for OpenCV FileStorage
 void write(FileStorage& fs, const std::string&, const StereoCalibration& x)
 {
 	x.write(fs);
@@ -33,21 +47,22 @@ void read(const FileNode& node, StereoCalibration& x, const StereoCalibration& d
 		x.read(node);
 }
 
+// Print StereoCalibration to console
 ostream& operator<<(ostream& out, const StereoCalibration& d)
 {
-	cout << "<Stereo calibration parameters>" << endl;
-	cout << "cameraMatrix[0] = " << endl << d.cameraMatrix[0] << endl << endl;
-	cout << "cameraMatrix[1] = " << endl << d.cameraMatrix[1] << endl << endl;
-	cout << "distCoeffs[0] = " << endl << d.distCoeffs[0] << endl << endl;
-	cout << "distCoeffs[1] = " << endl << d.distCoeffs[1] << endl << endl;
-	cout << "R = " << endl << d.R << endl << endl;
-	cout << "T = " << endl << d.T << endl << endl;
-	cout << "E = " << endl << d.E << endl << endl;
-	cout << "F = " << endl << d.F << endl << endl;
-	cout << "chessboard_size = " << d.chessboard_size << endl << endl;
-	cout << "chessboard_square_size = " << d.chessboard_square_size << endl << endl;
-	cout << "rms error = " << d.rms << endl << endl;
-	cout << "avg_reprojection_error = " << d.avg_reprojection_error << endl << endl;
+	out << "<Stereo calibration parameters>" << endl;
+	out << "cameraMatrix[0] = " << endl << d.cameraMatrix[0] << endl << endl;
+	out << "cameraMatrix[1] = " << endl << d.cameraMatrix[1] << endl << endl;
+	out << "distCoeffs[0] = " << endl << d.distCoeffs[0] << endl << endl;
+	out << "distCoeffs[1] = " << endl << d.distCoeffs[1] << endl << endl;
+	out << "R = " << endl << d.R << endl << endl;
+	out << "T = " << endl << d.T << endl << endl;
+	out << "E = " << endl << d.E << endl << endl;
+	out << "F = " << endl << d.F << endl << endl;
+	out << "chessboard_size = " << d.chessboard_size << endl << endl;
+	out << "chessboard_square_size = " << d.chessboard_square_size << endl << endl;
+	out << "rms error = " << d.rms << endl << endl;
+	out << "avg_reprojection_error = " << d.avg_reprojection_error << endl << endl;
     return out;
 }
 
@@ -79,3 +94,45 @@ std::string trim_copy(
 		return s;
 	return trim_left_copy( trim_right_copy( s, delimiters ), delimiters );
 }
+
+// from OpenCV source
+const int draw_shift_bits = 4;
+const int draw_multiplier = 1 << draw_shift_bits;
+void _drawKeypoint( Mat& img, const KeyPoint& p, const Scalar& color, int flags )
+{
+    CV_Assert( !img.empty() );
+    Point center( cvRound(p.pt.x * draw_multiplier), cvRound(p.pt.y * draw_multiplier) );
+
+    if( flags & DrawMatchesFlags::DRAW_RICH_KEYPOINTS )
+    {
+        int radius = cvRound(p.size/2 * draw_multiplier); // KeyPoint::size is a diameter
+
+        // draw the circles around keypoints with the keypoints size
+        circle( img, center, radius, color, 1, CV_AA, draw_shift_bits );
+
+        // draw orientation of the keypoint, if it is applicable
+        if( p.angle != -1 )
+        {
+            float srcAngleRad = p.angle*(float)CV_PI/180.f;
+            Point orient( cvRound(cos(srcAngleRad)*radius ),
+                          cvRound(sin(srcAngleRad)*radius )
+                        );
+            line( img, center, center+orient, color, 1, CV_AA, draw_shift_bits );
+        }
+#if 0
+        else
+        {
+            // draw center with R=1
+            int radius = 1 * draw_multiplier;
+            circle( img, center, radius, color, 1, CV_AA, draw_shift_bits );
+        }
+#endif
+    }
+    else
+    {
+        // draw center with R=3
+        int radius = 3 * draw_multiplier;
+        circle( img, center, radius, color, 1, CV_AA, draw_shift_bits );
+    }
+}
+

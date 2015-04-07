@@ -25,4 +25,5 @@ public:
 	int unused_keypoint_frame_limit;
 	int keypoint_detect_rate;
 	int duplicate_removal_rate;
+	float similiar_as_limit;
 };

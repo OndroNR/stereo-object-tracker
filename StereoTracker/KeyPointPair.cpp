@@ -9,6 +9,7 @@ KeyPointPair::KeyPointPair(KeyPointEx* a, KeyPointEx* b, double time)
 	kpx[1] = b;
 	a->hasPair = true;
 	b->hasPair = true;
+	b->color = a->color;
 	scheduledDelete = false;
 	pt = calcWorldPt(Point3f(kpx[0]->pt.x, kpx[0]->pt.y, disparity()));
 	movement_vec = Point3f(0,0,0);
@@ -18,7 +19,7 @@ KeyPointPair::KeyPointPair(KeyPointEx* a, KeyPointEx* b, double time)
 
 float KeyPointPair::disparity()
 {
-	return abs(kpx[0]->pt.y - kpx[1]->pt.y);
+	return abs(kpx[0]->pt.x - kpx[1]->pt.x);
 }
 
 void KeyPointPair::scheduleDelete()

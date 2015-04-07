@@ -36,46 +36,6 @@ void showMenu()
 	cout << "Select command: ";
 }
 
-const int draw_shift_bits = 4;
-const int draw_multiplier = 1 << draw_shift_bits;
-static inline void _drawKeypoint( Mat& img, const KeyPoint& p, const Scalar& color, int flags )
-{
-    CV_Assert( !img.empty() );
-    Point center( cvRound(p.pt.x * draw_multiplier), cvRound(p.pt.y * draw_multiplier) );
-
-    if( flags & DrawMatchesFlags::DRAW_RICH_KEYPOINTS )
-    {
-        int radius = cvRound(p.size/2 * draw_multiplier); // KeyPoint::size is a diameter
-
-        // draw the circles around keypoints with the keypoints size
-        circle( img, center, radius, color, 1, CV_AA, draw_shift_bits );
-
-        // draw orientation of the keypoint, if it is applicable
-        if( p.angle != -1 )
-        {
-            float srcAngleRad = p.angle*(float)CV_PI/180.f;
-            Point orient( cvRound(cos(srcAngleRad)*radius ),
-                          cvRound(sin(srcAngleRad)*radius )
-                        );
-            line( img, center, center+orient, color, 1, CV_AA, draw_shift_bits );
-        }
-#if 0
-        else
-        {
-            // draw center with R=1
-            int radius = 1 * draw_multiplier;
-            circle( img, center, radius, color, 1, CV_AA, draw_shift_bits );
-        }
-#endif
-    }
-    else
-    {
-        // draw center with R=3
-        int radius = 3 * draw_multiplier;
-        circle( img, center, radius, color, 1, CV_AA, draw_shift_bits );
-    }
-}
-
 bool loadConfig()
 {
 	std::ifstream configInput("config.txt");
@@ -105,6 +65,10 @@ int main( int argc, char** argv )
 	FileStorage fs;
 	Fps fps;
 	int counter = 0;
+	Size frameSize(0,0);
+
+	frameSize.width = ConfigStore::get().getInt("frame_width");
+	frameSize.height = ConfigStore::get().getInt("frame_height");
 
 
 	while (!quit)
@@ -231,7 +195,7 @@ int main( int argc, char** argv )
 
 				StereoPair remap;
 
-				StereoPreprocessing stereoPrep(scp, Size(640,480), 1);
+				StereoPreprocessing stereoPrep(scp, frameSize, 1);
 
 				BackgroundProcessing bgProc;
 				StereoPair fgMaskMOG2;
@@ -286,16 +250,42 @@ int main( int argc, char** argv )
 
 							vector<KeyPointEx*>::const_iterator it = mt.kpx[k].begin(),
 															 end = mt.kpx[k].end();
-							RNG& rng=theRNG();
 							for( ; it != end; ++it )
 							{
-								Scalar color = Scalar(rng(256), rng(256), rng(256));
-								_drawKeypoint( remap_kp.frames[k], **it, color, DrawMatchesFlags::DEFAULT );
+								_drawKeypoint( remap_kp.frames[k], **it, (*it)->color, DrawMatchesFlags::DEFAULT );
 							}
 						}
-					
+
+						Mat keypoints = sideBySideMat(remap_kp.frames[0], remap_kp.frames[1]);
+						for (size_t i = 0; i < sr.pairs.size(); i++)
+						{
+							line(keypoints, sr.pairs[i]->kpx[0]->pt, Point(sr.pairs[i]->kpx[1]->pt.x+frameSize.width, sr.pairs[i]->kpx[1]->pt.y), sr.pairs[i]->kpx[0]->color);
+
+							Point pt = sr.pairs[i]->kpx[1]->pt;
+							pt.x += frameSize.width;
+							setLabel(keypoints, to_string((int)sr.pairs[i]->pt.z), pt);
+							//putText(keypoints, to_string((int)sr.pairs[i]->pt.z).c_str(), pt, FONT_HERSHEY_PLAIN, 0.7, Scalar(255,255,255));
+						}
+
+						// write ply
+						ofstream ply_file(("ply" + to_string(counter) + ".ply").c_str());
+						ply_file << "ply\nformat ascii 1.0\n";
+						ply_file << "element vertex " << to_string(sr.pairs.size()*2) << "\n";
+						ply_file << "property float x\nproperty float y\nproperty float z\n";
+						ply_file << "property uchar red\nproperty uchar green\nproperty uchar blue\n";
+						ply_file << "end_header\n";
+
+						for (size_t i = 0; i < sr.pairs.size(); i++)
+						{
+							KeyPointPair kpp = *sr.pairs[i];
+
+							ply_file << to_string(kpp.kpx[0]->pt.x) << " " << to_string(kpp.kpx[0]->pt.y) << " " << to_string(kpp.pt.z) << " 255 0 0\n";
+							ply_file << to_string(kpp.pt.x) << " " << to_string(kpp.pt.y) << " " << to_string(kpp.pt.z) << " 0 255 0\n";
+						}
+						ply_file.close();
+
 						//imshow("Keypoints", remap_kp.frames[0]);
-						imshow("Keypoints", sideBySideMat(remap_kp.frames[0], remap_kp.frames[1]));
+						imshow("Keypoints", keypoints);
 
 						
 					}

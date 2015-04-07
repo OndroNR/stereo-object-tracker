@@ -8,6 +8,10 @@ sri.path=d:\data\dp\stereo\150326-115859 capture5\
 sri.frames_subpath=
 sri.list_filename=list.txt
 
+# frame size
+frame_width = 640
+frame_height = 480
+
 # calibration pattern
 calibration_pattern.cols = 10
 calibration_pattern.rows = 7
@@ -21,6 +25,7 @@ stereo_calibration_path = stereo_calibration.xml
 mt.keypoint_detect_rate = 10
 mt.unused_keypoint_frame_limit = 10
 mt.duplicate_removal_rate = 3
+mt.similiar_as_limit = 10
 
 # StereoReconstrution
 sr.line_filter_enabled = 1
@@ -29,7 +34,19 @@ sr.same_movement_filter_enabled = 1
 sr.regular_check_pair_validity = 1
 
 # whole 3D space rotation, translation, scaling
+apply_world_calibration = 1
 world_calibration_path = world_calibration.xml
 
 # rotating and translating to common origin and ground plane
+apply_world_adjust = 1
 world_adjust_path = world_adjust.xml
+
+# Clustering + dead reckoning stuff
+# apply distance threshold movement vector difference
+# movement vector difference threshold
+# distance threshold
+# apply dead reckoning
+
+# OutputProcessing
+# minimal pairs in cluster
+# output file
