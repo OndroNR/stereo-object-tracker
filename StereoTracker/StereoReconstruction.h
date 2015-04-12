@@ -20,5 +20,6 @@ public:
 	int line_filter_limit;
 	bool same_movement_filter_enabled;
 	bool regular_check_pair_validity;
+	int unused_pair_frame_limit;
 };
 

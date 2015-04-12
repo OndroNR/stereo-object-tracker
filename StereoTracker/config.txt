@@ -35,6 +35,7 @@ sr.line_filter_enabled = 1
 sr.line_filter_limit = 2
 sr.same_movement_filter_enabled = 1
 sr.regular_check_pair_validity = 1
+sr.unused_pair_frame_limit = 10
 
 # whole 3D space rotation, translation, scaling
 apply_world_calibration = 1
@@ -45,6 +46,18 @@ apply_world_adjust = 1
 world_adjust_path = world_adjust.xml
 
 # Clustering + dead reckoning stuff
+# 20cm
+clustering.max_cluster_distance = 20
+# 10cm
+clustering.max_pair_distance = 10
+clustering.export_min_pairs = 1
+
+clustering.cluster_merge_distance_limit = 20
+clustering.cluster_merge_angle_limit = 35
+clustering.cluster_merge_length_limit = 10
+clustering.cluster_pair_angle_limit = 35
+clustering.cluster_pair_length_limit = 20
+
 # apply distance threshold movement vector difference
 # movement vector difference threshold
 # distance threshold

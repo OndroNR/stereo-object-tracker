@@ -15,6 +15,10 @@ KeyPointPair::KeyPointPair(KeyPointEx* a, KeyPointEx* b, double time)
 	movement_vec = Point3f(0,0,0);
 	last_time = time;
 	uncheckedFor = 0;
+
+	hasCluster = false;
+	cluster = NULL;
+	unusedFor = 0;
 }
 
 float KeyPointPair::disparity()

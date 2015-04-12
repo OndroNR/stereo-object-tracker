@@ -136,3 +136,7 @@ void _drawKeypoint( Mat& img, const KeyPoint& p, const Scalar& color, int flags 
     }
 }
 
+double angleBetween(Point3f pt1, Point3f pt2)
+{
+	return atan2(norm(pt1.cross(pt2)), pt1.dot(pt2));
+}

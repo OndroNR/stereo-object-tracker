@@ -40,7 +40,7 @@ void WorldCalibration::setPoints(StereoPair frames)
 		cout << "Pick point in right image!" << endl;
 		Point rightPt = picker.pickPoint(frames.frames[1], "Right point", imagePoints[1][i]);
 
-		Point3f imagePoint = Point3f(leftPt.x, leftPt.y, abs(leftPt.x - rightPt.x));
+		Point3f imagePoint = Point3f((float)leftPt.x, (float)leftPt.y, (float)abs(leftPt.x - rightPt.x));
 		Point3f imageWorldPoint = KeyPointPair::calcWorldPt(imagePoint);
 
 		imagePoints[0][i] = leftPt;

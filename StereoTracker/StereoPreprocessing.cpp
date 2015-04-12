@@ -32,6 +32,7 @@ bool StereoPreprocessing::ProcessPair(struct StereoPair& inputPair, struct Stere
 {
 	cv::remap(inputPair.frames[0], outputPair.frames[0], rmap[0][0], rmap[0][1], CV_INTER_LINEAR);
 	cv::remap(inputPair.frames[1], outputPair.frames[1], rmap[1][0], rmap[1][1], CV_INTER_LINEAR);
+	outputPair.timestamp = inputPair.timestamp;
 
 	return true;
 }

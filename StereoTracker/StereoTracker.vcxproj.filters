@@ -57,6 +57,12 @@
     <ClCompile Include="PointPicker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Cluster.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Clustering.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StereoVideoInput.h">
@@ -102,6 +108,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PointPicker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Cluster.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Clustering.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

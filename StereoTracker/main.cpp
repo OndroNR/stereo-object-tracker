@@ -16,6 +16,7 @@
 #include "MotionTracking.h"
 #include "StereoReconstruction.h"
 #include "WorldCalibration.h"
+#include "Clustering.h"
 #include "Fps.h"
 
 using namespace cv;
@@ -218,6 +219,8 @@ int main( int argc, char** argv )
 				KeyPointPair::Q = stereoPrep.rp->Q;
 
 				StereoReconstruction sr;
+
+				Clustering clustering;
 				
 
 				bool has_fg = false;
@@ -250,6 +253,8 @@ int main( int argc, char** argv )
 
 						sr.Process(mt.kpx, remap);
 
+						clustering.Process(sr.pairs, remap.timestamp);
+
 						//drawKeypoints(remap.frames[0], mt.kpx[0], remap_kp.frames[0]);
 						//drawKeypoints(remap.frames[0], dynamic_cast<vector<KeyPoint>>(mt.kpx[0]), remap_kp.frames[0]);
 
@@ -270,7 +275,7 @@ int main( int argc, char** argv )
 						Mat keypoints = sideBySideMat(remap_kp.frames[0], remap_kp.frames[1]);
 						for (size_t i = 0; i < sr.pairs.size(); i++)
 						{
-							line(keypoints, sr.pairs[i]->kpx[0]->pt, Point(sr.pairs[i]->kpx[1]->pt.x+frameSize.width, sr.pairs[i]->kpx[1]->pt.y), sr.pairs[i]->kpx[0]->color);
+							line(keypoints, sr.pairs[i]->kpx[0]->pt, Point((int)sr.pairs[i]->kpx[1]->pt.x+frameSize.width, (int)sr.pairs[i]->kpx[1]->pt.y), sr.pairs[i]->kpx[0]->color);
 
 							Point pt = sr.pairs[i]->kpx[1]->pt;
 							pt.x += frameSize.width;
@@ -323,6 +328,7 @@ int main( int argc, char** argv )
 					}
 					cout << "Current keypoint count: " << mt.kpx[0].size() << "; " << mt.kpx[1].size() << endl;
 					cout << "Current pairs count: " << sr.pairs.size() << endl;
+					cout << "Current cluster count: " << clustering.clusters.size() << endl;
 
 					int key = waitKey(5);
 					if(key >= 0)

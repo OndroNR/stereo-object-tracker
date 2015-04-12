@@ -4,6 +4,8 @@
 #include <string>
 #include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
+#define _USE_MATH_DEFINES
+#include "math.h"
 
 #if defined(WIN32) || defined(_WIN32) 
 #define PATH_SEPARATOR "\\" 
@@ -101,3 +103,15 @@ std::string trim_copy(
 	const std::string& delimiters = " \f\n\r\t\v" );
 
 void _drawKeypoint( Mat& img, const KeyPoint& p, const Scalar& color, int flags );
+
+double angleBetween(Point3f pt1, Point3f pt2);
+
+inline double degreesToRadians(double dgr)
+{
+	return dgr * (M_PI/180);
+}
+
+inline double radiansToDegrees(double rad)
+{
+	return rad * (180/M_PI);
+}

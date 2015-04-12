@@ -9,6 +9,7 @@ StereoReconstruction::StereoReconstruction(void)
 	line_filter_limit = ConfigStore::get().getInt("sr.line_filter_limit");
 	same_movement_filter_enabled = ConfigStore::get().getInt("sr.same_movement_filter_enabled") > 0;
 	regular_check_pair_validity = ConfigStore::get().getInt("sr.regular_check_pair_validity") > 0;
+	unused_pair_frame_limit = ConfigStore::get().getInt("sr.unused_pair_frame_limit");
 }
 
 
@@ -148,6 +149,18 @@ bool StereoReconstruction::Process(vector<KeyPointEx*> kpx[2], StereoPair& frame
 				{
 					kp_direct_kpx[k][i]->unusedFor++;
 				}
+			}
+		}
+	}
+
+	// schedule unused pairs for deletion
+	if (pairs.size() > 0)
+	{
+		for (vector<KeyPointPair*>::iterator it = pairs.begin(); it < pairs.end(); ++it)
+		{
+			if ((*it)->unusedFor >= unused_pair_frame_limit)
+			{
+				(*it)->scheduledDelete = true;
 			}
 		}
 	}
