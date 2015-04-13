@@ -85,7 +85,7 @@ bool Clustering::Process(vector<KeyPointPair*> pairs, double timestamp)
 					for (vector<Cluster*>::iterator cluster = clusters.begin(); cluster < clusters.end(); ++cluster)
 					{
 						float cluster_distance = (*cluster)->distanceTo(*kpp);
-						// TODO: different threshold for dead reckoning?
+						// TODO: different (larger) threshold for dead reckoning?
 						if (cluster_distance < max_cluster_distance)
 						{
 							candidates.push_back(*cluster);
@@ -134,10 +134,11 @@ bool Clustering::Process(vector<KeyPointPair*> pairs, double timestamp)
 							(*cluster)->pairs.push_back(*kpp);
 							(*kpp)->hasCluster = true;
 							(*kpp)->cluster = *cluster;
+							break;
 						}
 						else
 						{
-							cout << "Movement bad: angle = " << isMovementAngleSimilar(*cluster, *kpp, cluster_pair_angle_limit) << ", length" << isMovementLengthSimilar(*cluster, *kpp, cluster_pair_length_limit) << endl;
+							cout << "Cluster join failed on: angle = " << isMovementAngleSimilar(*cluster, *kpp, cluster_pair_angle_limit) << ", length = " << isMovementLengthSimilar(*cluster, *kpp, cluster_pair_length_limit) << endl;
 						}
 					}
 				}

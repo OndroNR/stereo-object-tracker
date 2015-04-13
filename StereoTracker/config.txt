@@ -28,7 +28,7 @@ stereo_rectify_alpha = 0.7
 mt.keypoint_detect_rate = 10
 mt.unused_keypoint_frame_limit = 10
 mt.duplicate_removal_rate = 3
-mt.similiar_as_limit = 10
+mt.similiar_as_limit = 5
 
 # StereoReconstrution
 sr.line_filter_enabled = 1
@@ -49,13 +49,15 @@ world_adjust_path = world_adjust.xml
 # 20cm
 clustering.max_cluster_distance = 20
 # 10cm
-clustering.max_pair_distance = 10
+clustering.max_pair_distance = 20
 clustering.export_min_pairs = 1
 
-clustering.cluster_merge_distance_limit = 20
-clustering.cluster_merge_angle_limit = 35
+clustering.cluster_merge_distance_limit = 30
+clustering.cluster_merge_angle_limit = 45
+# per second movement
 clustering.cluster_merge_length_limit = 10
-clustering.cluster_pair_angle_limit = 35
+clustering.cluster_pair_angle_limit = 45
+# per second movement
 clustering.cluster_pair_length_limit = 20
 
 # apply distance threshold movement vector difference

@@ -96,6 +96,12 @@ Point3f Cluster::movementVector()
 		return Point3f(0,0,0);
 	}
 
+	// workaround
+	if (history_timestamp[0] == history_timestamp[1])
+	{
+		return Point3f(0,0,0);
+	}
+
 	float delta_time = (float)(history_timestamp[1] - history_timestamp[0]);
 	Point3f movement_vec = (history_pt[1] - history_pt[0]);
 	movement_vec.x /= delta_time;
@@ -113,6 +119,7 @@ void Cluster::mergeCluster(Cluster* cluster)
 	for (vector<KeyPointPair*>::iterator it = cluster->pairs.begin()++; it < cluster->pairs.end(); ++it)
 	{
 		this->pairs.push_back(*it);
+		(*it)->cluster = this;
 	}
 
 	this->pt = (this->pt * ours + cluster->pt * theirs) * (1/sum);
