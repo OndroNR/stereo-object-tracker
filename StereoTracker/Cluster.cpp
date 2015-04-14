@@ -116,7 +116,7 @@ void Cluster::mergeCluster(Cluster* cluster)
 	int theirs = cluster->pairs.size();
 	int sum = ours + theirs;
 
-	for (vector<KeyPointPair*>::iterator it = cluster->pairs.begin()++; it < cluster->pairs.end(); ++it)
+	for (vector<KeyPointPair*>::iterator it = cluster->pairs.begin(); it < cluster->pairs.end(); ++it)
 	{
 		this->pairs.push_back(*it);
 		(*it)->cluster = this;

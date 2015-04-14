@@ -233,11 +233,11 @@ int main( int argc, char** argv )
 					cout << endl << "Frame number: " << frame_num++ << endl;
 					struct StereoPair sp;
 					svi->GetNextPair(sp);
-					imshow("Input pair", sideBySideMat(sp.frames[0], sp.frames[1]));
+					//imshow("Input pair", sideBySideMat(sp.frames[0], sp.frames[1]));
 
 					stereoPrep.ProcessPair(sp, remap);
 
-					imshow("Remapped pair", sideBySideMat(remap.frames[0], remap.frames[1]));
+					//imshow("Remapped pair", sideBySideMat(remap.frames[0], remap.frames[1]));
 
 					bgProc.ProcessPair(remap, fgMaskMOG2);
 
@@ -316,7 +316,21 @@ int main( int argc, char** argv )
 						//imshow("Keypoints", remap_kp.frames[0]);
 						imshow("Keypoints", keypoints);
 
-						
+
+						Mat clusterPoints;
+						remap.frames[0].copyTo( clusterPoints );
+						for (vector<Cluster*>::iterator cluster = clustering.clusters.begin(); cluster < clustering.clusters.end(); ++cluster)
+						{
+							if ((*cluster)->pairs.size() > 0)
+							{
+								for (vector<KeyPointPair*>::iterator pair = (*cluster)->pairs.begin(); pair < (*cluster)->pairs.end(); ++pair)
+								{
+									_drawKeypoint( clusterPoints, *(*pair)->kpx[0], (*cluster)->color, DrawMatchesFlags::DEFAULT );
+								}
+							}
+						}
+		
+						imshow("Cluster keypoints", clusterPoints);
 					}
 
 					fps.update();
@@ -341,6 +355,7 @@ int main( int argc, char** argv )
 				cv::destroyWindow("Remapped pair");
 				cv::destroyWindow("Foreground mask");
 				cv::destroyWindow("Keypoints");
+				cv::destroyWindow("Cluster keypoints");
 				break;
 			}
 		case '8':

@@ -8,7 +8,7 @@ Clustering::Clustering(void)
 	export_min_pairs = ConfigStore::get().getInt("clustering.export_min_pairs");
 	max_cluster_distance = ConfigStore::get().getFloat("clustering.max_cluster_distance");
 	max_pair_distance = ConfigStore::get().getFloat("clustering.max_pair_distance");
-	cluster_merge_distance_limit = degreesToRadians(ConfigStore::get().getFloat("clustering.cluster_merge_distance_limit"));
+	cluster_merge_distance_limit = ConfigStore::get().getFloat("clustering.cluster_merge_distance_limit");
 	cluster_merge_angle_limit = (float) degreesToRadians(ConfigStore::get().getFloat("clustering.cluster_merge_angle_limit"));
 	cluster_merge_length_limit = ConfigStore::get().getFloat("clustering.cluster_merge_length_limit");
 	cluster_pair_angle_limit = (float) degreesToRadians(ConfigStore::get().getFloat("clustering.cluster_pair_angle_limit"));

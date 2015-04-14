@@ -22,7 +22,7 @@ calibration_pattern.square_size = 2.4
 stereo_calibration_path = stereo_calibration.xml
 
 # world calibration depends on this value!
-stereo_rectify_alpha = 0.7
+stereo_rectify_alpha = 1
 
 # MotionTracking
 mt.keypoint_detect_rate = 10
@@ -53,9 +53,10 @@ clustering.max_pair_distance = 20
 clustering.export_min_pairs = 1
 
 clustering.cluster_merge_distance_limit = 30
-clustering.cluster_merge_angle_limit = 45
+clustering.cluster_merge_angle_limit = 25
 # per second movement
-clustering.cluster_merge_length_limit = 10
+clustering.cluster_merge_length_limit = 5
+
 clustering.cluster_pair_angle_limit = 45
 # per second movement
 clustering.cluster_pair_length_limit = 20
