@@ -206,9 +206,30 @@ bool Clustering::Process(vector<KeyPointPair*> pairs, double timestamp)
 				// 1. update polohy + 2. dead reckoning
 				(*cluster)->computePt(timestamp);
 
-				// TODO: 3. overenie ci pary suhlasia s pohybom, tak nie, vyclenit prec
+				// TODO: 3. overenie ci pary suhlasia s pohybom, ak nie, vyclenit prec
+				if ((*cluster)->pairs.size() > 0)
+				{
+					float averageDistance = (*cluster)->averagePointDistance();
+					float medianDistance = (*cluster)->medianPointDistance();
+
+					for (vector<KeyPointPair*>::iterator pair = (*cluster)->pairs.begin(); pair < (*cluster)->pairs.end();)
+					{
+						if ( (*cluster)->distanceTo(*pair) > (averageDistance * 2.0))
+						{
+							(*pair)->scheduleDelete();
+							pair = (*cluster)->pairs.erase(pair);
+						}
+						else
+						{
+							++pair;
+						}
+					}
+				}
+
 				// cluster_pair_angle_limit
 				// cluster_pair_length_limit
+				// cluster_pair_distance_limit?
+
 
 				//	4. kpp[].unusedFor = 0; deadFor management
 				if ((*cluster)->pairs.size() > 0)
@@ -219,10 +240,10 @@ bool Clustering::Process(vector<KeyPointPair*> pairs, double timestamp)
 						(*pair)->unusedFor = 0;
 					}
 
-					if ((*cluster)->pairs.size() < 5)
+					if ((*cluster)->pairs.size() < 5) // TODO: parametrize
 					{
 						(*cluster)->lowPointCountFor++;
-						if ( (*cluster)->lowPointCountFor > 10)
+						if ( (*cluster)->lowPointCountFor > 10) // TODO: parametrize
 						{
 							(*cluster)->scheduleDelete();
 						}
@@ -235,7 +256,7 @@ bool Clustering::Process(vector<KeyPointPair*> pairs, double timestamp)
 				else
 				{
 					(*cluster)->deadFor++;
-					if ( (*cluster)->deadFor > 20)
+					if ( (*cluster)->deadFor > 20) // TODO: parametrize
 					{
 						(*cluster)->scheduleDelete();
 					}

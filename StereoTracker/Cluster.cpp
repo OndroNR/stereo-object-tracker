@@ -184,6 +184,35 @@ float Cluster::boundingSphere()
 	return max_distance;
 }
 
+float Cluster::averagePointDistance()
+{
+	if (pairs.size() == 0)
+		return 0;
+
+	float avg = 0;
+	for (vector<KeyPointPair*>::iterator it = pairs.begin()++; it < pairs.end(); it++)
+	{
+		Point3f pt = (*it)->pt;
+		avg += this->distanceTo(*it);
+	}
+	return avg / pairs.size();
+}
+
+float Cluster::medianPointDistance()
+{
+	if (pairs.size() == 0)
+		return 0;
+
+	vector<float> distances;
+	for (vector<KeyPointPair*>::iterator it = pairs.begin()++; it < pairs.end(); it++)
+	{
+		Point3f pt = (*it)->pt;
+		distances.push_back(this->distanceTo(*it));
+	}
+
+	return vecMedian(distances);
+}
+
 void Cluster::scheduleDelete()
 {
 	scheduledDelete = true;

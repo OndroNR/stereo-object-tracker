@@ -31,6 +31,9 @@ public:
 
 	pair<Point3f, Point3f> boundingBox();
 	float boundingSphere(); // max distance as radius
+
+	float averagePointDistance();
+	float medianPointDistance();
 	
 	// TODO: float representativeSphere(); // some quantil or what, more noise and outlier immune
 	void scheduleDelete();
