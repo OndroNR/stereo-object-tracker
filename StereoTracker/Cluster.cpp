@@ -126,6 +126,9 @@ void Cluster::mergeCluster(Cluster* cluster)
 	int theirs = cluster->pairs.size();
 	int sum = ours + theirs;
 
+	if (ours == 0)
+		return; // nothing to merge (can't merge dead cluster)
+
 	for (vector<KeyPointPair*>::iterator it = cluster->pairs.begin(); it < cluster->pairs.end(); ++it)
 	{
 		this->pairs.push_back(*it);
