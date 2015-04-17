@@ -230,10 +230,12 @@ int main( int argc, char** argv )
 
 				for (;;)
 				{
-					cout << endl << "Frame number: " << frame_num++ << endl;
 					struct StereoPair sp;
 					svi->GetNextPair(sp);
+					cout << endl << "Frame number: " << frame_num++ << ", timestamp: " << sp.timestamp << endl;
+
 					//imshow("Input pair", sideBySideMat(sp.frames[0], sp.frames[1]));
+					
 
 					stereoPrep.ProcessPair(sp, remap);
 
@@ -335,7 +337,7 @@ int main( int argc, char** argv )
 
 					fps.update();
 					counter++;
-					if (counter % 10 == 0)
+					if (counter % 5 == 0)
 					{
 						
 						std::cout << "Processing fps: " << fps.get() << endl;

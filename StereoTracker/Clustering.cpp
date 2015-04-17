@@ -172,8 +172,9 @@ bool Clustering::Process(vector<KeyPointPair*> pairs, double timestamp)
 
 					if (abs(norm( (*cluster1)->pt - (*cluster2)->pt )) < cluster_merge_distance_limit)
 					{
-						if (isMovementAngleSimilar(*cluster1, *cluster2, cluster_pair_angle_limit) && isMovementLengthSimilar(*cluster1, *cluster2, cluster_pair_length_limit))
+						if (isMovementAngleSimilar(*cluster1, *cluster2, cluster_merge_angle_limit) && isMovementLengthSimilar(*cluster1, *cluster2, cluster_merge_length_limit))
 						{
+							cout << "Cluster " << (*cluster1)->id << " merges cluster " << (*cluster2)->id << endl;
 							something_left = true;
 							(*cluster1)->mergeCluster(*cluster2);
 							(*cluster2)->scheduledDelete = true;
@@ -212,9 +213,10 @@ bool Clustering::Process(vector<KeyPointPair*> pairs, double timestamp)
 					float averageDistance = (*cluster)->averagePointDistance();
 					float medianDistance = (*cluster)->medianPointDistance();
 
+					// remove pairs much farer than average distance from cluster position
 					for (vector<KeyPointPair*>::iterator pair = (*cluster)->pairs.begin(); pair < (*cluster)->pairs.end();)
 					{
-						if ( (*cluster)->distanceTo(*pair) > (averageDistance * 2.0))
+						if ( (*cluster)->distanceTo(*pair) > (averageDistance * 2.0)) // TODO: parametrizovat
 						{
 							(*pair)->scheduleDelete();
 							pair = (*cluster)->pairs.erase(pair);
@@ -315,11 +317,13 @@ bool Clustering::isMovementLengthSimilar(Cluster* cluster1, Cluster* cluster2, f
 bool Clustering::isMovementAngleSimilar(Point3f a, Point3f b, float threshold)
 {
 	float angle_diff = (float) abs(angleBetween(a, b));
+	cout << "Angle diff: " << angle_diff << endl;
 	return angle_diff <= threshold;
 }
 
 bool Clustering::isMovementLengthSimilar(Point3f a, Point3f b, float threshold)
 {
 	float length_diff = (float) abs(norm(a) - norm(b));
+	cout << "Length diff: " << length_diff << endl;
 	return length_diff <= threshold;
 }
