@@ -52,7 +52,7 @@ clustering.max_cluster_distance = 20
 clustering.max_pair_distance = 20
 clustering.export_min_pairs = 1
 
-clustering.cluster_merge_distance_limit = 30
+clustering.cluster_merge_distance_limit = 20
 clustering.cluster_merge_angle_limit = 25
 # per second movement
 clustering.cluster_merge_length_limit = 5
