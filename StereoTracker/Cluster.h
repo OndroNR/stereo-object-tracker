@@ -14,6 +14,7 @@ public:
 	vector<KeyPointPair*> pairs;
 	int unusedFor; // frames not used for
 	int deadFor; // frames without enough KPP
+	int lowPointCountFor; // frames with low KPP count
 	bool scheduledDelete;
 	Point3f pt;
 	double timestamp;

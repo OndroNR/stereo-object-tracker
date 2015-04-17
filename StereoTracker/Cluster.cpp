@@ -6,6 +6,7 @@ Cluster::Cluster(int id, KeyPointPair* kpp, double timestamp)
 	this->id = id;
 	unusedFor = 0;
 	deadFor = 0;
+	lowPointCountFor = 0;
 	scheduledDelete = false;
 	pt = kpp->pt;
 	this->timestamp = timestamp;

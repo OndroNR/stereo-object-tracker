@@ -218,6 +218,19 @@ bool Clustering::Process(vector<KeyPointPair*> pairs, double timestamp)
 					{
 						(*pair)->unusedFor = 0;
 					}
+
+					if ((*cluster)->pairs.size() < 5)
+					{
+						(*cluster)->lowPointCountFor++;
+						if ( (*cluster)->lowPointCountFor > 10)
+						{
+							(*cluster)->scheduleDelete();
+						}
+					}
+					else
+					{
+						(*cluster)->lowPointCountFor = 0;
+					}
 				}
 				else
 				{
