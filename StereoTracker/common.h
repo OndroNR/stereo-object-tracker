@@ -115,3 +115,6 @@ inline double radiansToDegrees(double rad)
 {
 	return rad * (180/M_PI);
 }
+
+float vecAverage(vector<float> v);
+float vecMedian(vector<float> v);

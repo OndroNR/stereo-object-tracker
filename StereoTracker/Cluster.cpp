@@ -30,13 +30,22 @@ void Cluster::computePt(double timestamp)
 
 	if (pairs.size() > 0)
 	{
-		Point3f avg;
+		vector<float> vec_x, vec_y, vec_z;
 		for (vector<KeyPointPair*>::iterator it = pairs.begin()++; it < pairs.end(); ++it)
 		{
-			avg += (*it)->pt;
+			vec_x.push_back( (*it)->pt.x );
+			vec_y.push_back( (*it)->pt.y);
+			vec_z.push_back( (*it)->pt.z );
 		}
-		avg = 1.0/pairs.size() * avg;
 
+		Point3f avg;
+		avg.x = vecAverage(vec_x);
+		avg.y = vecAverage(vec_y);
+		avg.z = vecAverage(vec_z);
+		//avg.x = vecMedian(vec_x);
+		//avg.y = vecMedian(vec_y);
+		//avg.z = vecMedian(vec_z);
+		
 		history_pt.insert(history_pt.begin(), avg);
 		history_timestamp.insert(history_timestamp.begin(), timestamp);
 

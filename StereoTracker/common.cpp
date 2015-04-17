@@ -140,3 +140,28 @@ double angleBetween(Point3f pt1, Point3f pt2)
 {
 	return atan2(norm(pt1.cross(pt2)), pt1.dot(pt2));
 }
+
+float vecAverage(vector<float> v)
+{
+	float acc = 0;
+	for (auto it = v.begin(); it < v.end(); ++it)
+	{
+		acc += *it;
+	}
+	return acc / v.size();
+}
+
+float vecMedian(vector<float> v)
+{
+	size_t size = v.size();
+	sort(v.begin(), v.end());
+
+	if (size  % 2 == 0)
+	{
+		return (v[size / 2 - 1] + v[size / 2]) / 2;
+	}
+	else 
+	{
+		return v[size / 2];
+	}
+}
