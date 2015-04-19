@@ -34,6 +34,7 @@ void showMenu()
 	cout << "6 - reset stream\n";
 	cout << "7 - play remapped + bg subtraction\n";
 	cout << "8 - calibrate world\n";
+	cout << "9 - set world origin\n";
 	cout << "p - save world calibration\n";
 	cout << "o - load world calibration\n";
 	cout << "0 - reload config\n";
@@ -393,6 +394,38 @@ int main( int argc, char** argv )
 				cout << "Done" << endl;
 				break;
 			}
+		case '9':
+			{
+				if (svi == NULL)
+				{
+					cout << "Stereo stream not loaded";
+					break;
+				}
+
+				if (scp == NULL)
+				{
+					cout << "Calibration missing";
+					break;
+				}
+
+				StereoPair remap;
+				StereoPreprocessing stereoPrep(scp, frameSize, 1);
+				KeyPointPair::Q = stereoPrep.rp->Q;
+
+				struct StereoPair sp;
+				svi->GetNextPair(sp);
+				stereoPrep.ProcessPair(sp, remap);
+				imshow("Remapped pair", sideBySideMat(remap.frames[0], remap.frames[1]));
+
+				wc->setOrigin(remap);
+				cout << "World origin = " << endl;
+				cout << wc->worldOrigin << endl << endl;
+
+				destroyWindow("Remapped pair");
+
+				cout << "Done" << endl;
+				break;
+			}
 		case 'o':
 		case 'O':
 			fs = FileStorage();
@@ -409,6 +442,12 @@ int main( int argc, char** argv )
 			fs["points0"] >> wc->points[0];
 			fs["points1"] >> wc->points[1];
 			fs["transformMatrix"] >> wc->transformMatrix;
+
+			fs["imageOriginLeft"] >> wc->imageOrigin[0];
+			fs["imageOriginRight"] >> wc->imageOrigin[1];
+			fs["cameraOrigin"] >> wc->cameraOrigin;
+			fs["worldOrigin"] >> wc->worldOrigin;
+
 			fs.release();
 			cout << "World calibration loaded" << endl;
 
@@ -422,6 +461,12 @@ int main( int argc, char** argv )
 			fs << "points0" << wc->points[0];
 			fs << "points1" << wc->points[1];
 			fs << "transformMatrix" << wc->transformMatrix;
+
+			fs << "imageOriginLeft" << wc->imageOrigin[0];
+			fs << "imageOriginRight" << wc->imageOrigin[1];
+			fs << "cameraOrigin" << wc->cameraOrigin;
+			fs << "worldOrigin" << wc->worldOrigin;
+
 			fs.release();
 			cout << "World calibration saved" << endl;
 

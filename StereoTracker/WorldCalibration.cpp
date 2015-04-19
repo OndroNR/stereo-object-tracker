@@ -24,6 +24,23 @@ WorldCalibration::~WorldCalibration(void)
 {
 }
 
+void WorldCalibration::setOrigin(StereoPair frames)
+{
+	PointPicker picker;
+
+	cout << "=== Origin point (0,0,0) ===" << endl;
+		
+	cout << "Pick point in left image!" << endl;
+	imageOrigin[0] = picker.pickPoint(frames.frames[0], "Left point", imageOrigin[0]);
+	cout << "Pick point in right image!" << endl;
+	imageOrigin[1] = picker.pickPoint(frames.frames[1], "Right point", imageOrigin[1]);
+
+	Point3f imagePoint = Point3f((float)imageOrigin[0].x, (float)imageOrigin[0].y, (float)abs(imageOrigin[0].x - imageOrigin[1].x));
+	cameraOrigin = KeyPointPair::calcWorldPt(imagePoint);
+
+	worldOrigin = transform(cameraOrigin);
+}
+
 void WorldCalibration::setPoints(StereoPair frames)
 {
 	PointPicker picker;
@@ -64,4 +81,13 @@ vector<Point3f> WorldCalibration::transform(vector<Point3f> pts)
 	vector<Point3f> dst;
 	perspectiveTransform(pts, dst, transformMatrix);
 	return dst;
+}
+
+Point3f WorldCalibration::transform(Point3f pt)
+{
+	vector<Point3f> pts;
+	pts.push_back(pt);
+	vector<Point3f> dst;
+	perspectiveTransform(pts, dst, transformMatrix);
+	return dst[0];
 }
