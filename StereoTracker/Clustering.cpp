@@ -28,6 +28,10 @@ Clustering::~Clustering(void)
 
 bool Clustering::Process(vector<KeyPointPair*> pairs, double timestamp)
 {
+	justMergedWith.clear();
+	justDeletedForLowPointCount.clear();
+	justDeletedForNoPoints.clear();
+
 	int active_clusters_count = 0;
 	// cleanup
 	for (vector<Cluster*>::iterator cluster = clusters.begin(); cluster < clusters.end();)
@@ -178,6 +182,7 @@ bool Clustering::Process(vector<KeyPointPair*> pairs, double timestamp)
 							something_left = true;
 							(*cluster1)->mergeCluster(*cluster2);
 							(*cluster2)->scheduledDelete = true;
+							justMergedWith.push_back(pair<int,int>((*cluster1)->id, (*cluster2)->id));
 						}
 					}
 				}
@@ -248,6 +253,7 @@ bool Clustering::Process(vector<KeyPointPair*> pairs, double timestamp)
 						if ( (*cluster)->lowPointCountFor > 10) // TODO: parametrize
 						{
 							(*cluster)->scheduleDelete();
+							justDeletedForLowPointCount.push_back( (*cluster)->id );
 						}
 					}
 					else
@@ -258,9 +264,11 @@ bool Clustering::Process(vector<KeyPointPair*> pairs, double timestamp)
 				else
 				{
 					(*cluster)->deadFor++;
+					(*cluster)->lowPointCountFor = 0;
 					if ( (*cluster)->deadFor > 20) // TODO: parametrize
 					{
 						(*cluster)->scheduleDelete();
+						justDeletedForNoPoints.push_back( (*cluster)->id );
 					}
 				}
 			}

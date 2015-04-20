@@ -12,6 +12,10 @@ public:
 	vector<Cluster*> clusters;
 	int next_cluster_id;
 
+	vector<pair<int, int>> justMergedWith; // cluster B was just merged into cluster A
+	vector<int> justDeletedForNoPoints;
+	vector<int> justDeletedForLowPointCount;
+
 	int export_min_pairs;
 
 	float max_cluster_distance;
