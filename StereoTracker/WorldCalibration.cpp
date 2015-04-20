@@ -69,10 +69,15 @@ void WorldCalibration::setPoints(StereoPair frames)
 
 Mat WorldCalibration::calcTransformationMatrix()
 {
-	Mat outputMat(3,4,CV_32F);
-	vector<uchar> outliers;
-	estimateAffine3D(points[0], points[1], outputMat, outliers);
+	Mat outputMat(3, 4, CV_64F);
+	vector<uchar> inliers;
+	estimateAffine3D(points[0], points[1], outputMat, inliers);
 	transformMatrix = outputMat;
+
+	// add last row for homogenous coordinate transformation
+	transformMatrix.resize(4, Scalar(0));
+	transformMatrix.at<double>(3,3) = 1.0f;
+
 	return transformMatrix;
 }
 
