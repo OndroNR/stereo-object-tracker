@@ -13,6 +13,7 @@ public:
 	void setPoints(StereoPair frames);
 	Mat calcTransformationMatrix();
 	vector<Point3f> transform(vector<Point3f> pts);
+	vector<Point3f> transformOrigin(vector<Point3f> pts);
 	Point3f WorldCalibration::transform(Point3f pt);
 	
 	vector<Point> imagePoints[2]; // left and right points in images

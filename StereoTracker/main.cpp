@@ -294,7 +294,7 @@ int main( int argc, char** argv )
 							{
 								camPoints.push_back(sr.pairs[i]->pt);
 							}
-							worldCalibratedPoints = wc->transform(camPoints);
+							worldCalibratedPoints = wc->transformOrigin(camPoints);
 						}
 
 						// write ply

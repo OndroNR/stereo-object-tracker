@@ -83,6 +83,19 @@ vector<Point3f> WorldCalibration::transform(vector<Point3f> pts)
 	return dst;
 }
 
+vector<Point3f> WorldCalibration::transformOrigin(vector<Point3f> pts)
+{
+	vector<Point3f> dst;
+	perspectiveTransform(pts, dst, transformMatrix);
+
+	// can be optimized with composit transformation matrix
+	for (auto it = dst.begin(); it < dst.end(); ++it)
+	{
+		*it = *it - worldOrigin;
+	}
+	return dst;
+}
+
 Point3f WorldCalibration::transform(Point3f pt)
 {
 	vector<Point3f> pts;
