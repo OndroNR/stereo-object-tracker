@@ -290,35 +290,35 @@ int main( int argc, char** argv )
 							//putText(keypoints, to_string((int)sr.pairs[i]->pt.z).c_str(), pt, FONT_HERSHEY_PLAIN, 0.7, Scalar(255,255,255));
 						}
 
-						vector<Point3f> camPoints;
-						vector<Point3f> worldCalibratedPoints;
-						if (sr.pairs.size() > 0)
-						{
-							for (size_t i = 0; i < sr.pairs.size(); i++)
-							{
-								camPoints.push_back(sr.pairs[i]->pt);
-							}
-							worldCalibratedPoints = wc->transformOrigin(camPoints);
-						}
+						//vector<Point3f> camPoints;
+						//vector<Point3f> worldCalibratedPoints;
+						//if (sr.pairs.size() > 0)
+						//{
+						//	for (size_t i = 0; i < sr.pairs.size(); i++)
+						//	{
+						//		camPoints.push_back(sr.pairs[i]->pt);
+						//	}
+						//	worldCalibratedPoints = wc->transformOrigin(camPoints);
+						//}
 
-						// write ply
-						ofstream ply_file(("ply" + to_string(counter) + ".ply").c_str());
-						ply_file << "ply\nformat ascii 1.0\n";
-						ply_file << "element vertex " << to_string(sr.pairs.size()*3) << "\n";
-						ply_file << "property float x\nproperty float y\nproperty float z\n";
-						ply_file << "property uchar red\nproperty uchar green\nproperty uchar blue\n";
-						ply_file << "end_header\n";
+						//// write ply
+						//ofstream ply_file(("ply" + to_string(counter) + ".ply").c_str());
+						//ply_file << "ply\nformat ascii 1.0\n";
+						//ply_file << "element vertex " << to_string(sr.pairs.size()*3) << "\n";
+						//ply_file << "property float x\nproperty float y\nproperty float z\n";
+						//ply_file << "property uchar red\nproperty uchar green\nproperty uchar blue\n";
+						//ply_file << "end_header\n";
 
-						for (size_t i = 0; i < sr.pairs.size(); i++)
-						{
-							KeyPointPair kpp = *sr.pairs[i];
-							Point3f worldPoint = worldCalibratedPoints[i];
+						//for (size_t i = 0; i < sr.pairs.size(); i++)
+						//{
+						//	KeyPointPair kpp = *sr.pairs[i];
+						//	Point3f worldPoint = worldCalibratedPoints[i];
 
-							ply_file << to_string(kpp.kpx[0]->pt.x) << " " << to_string(kpp.kpx[0]->pt.y) << " " << to_string(kpp.pt.z) << " 255 0 0\n";
-							ply_file << to_string(kpp.pt.x) << " " << to_string(kpp.pt.y) << " " << to_string(kpp.pt.z) << " 0 255 0\n";
-							ply_file << to_string(worldPoint.x) << " " << to_string(worldPoint.y) << " " << to_string(worldPoint.z) << " 0 0 255\n";
-						}
-						ply_file.close();
+						//	ply_file << to_string(kpp.kpx[0]->pt.x) << " " << to_string(kpp.kpx[0]->pt.y) << " " << to_string(kpp.pt.z) << " 255 0 0\n";
+						//	ply_file << to_string(kpp.pt.x) << " " << to_string(kpp.pt.y) << " " << to_string(kpp.pt.z) << " 0 255 0\n";
+						//	ply_file << to_string(worldPoint.x) << " " << to_string(worldPoint.y) << " " << to_string(worldPoint.z) << " 0 0 255\n";
+						//}
+						//ply_file.close();
 
 						//imshow("Keypoints", remap_kp.frames[0]);
 						imshow("Keypoints", keypoints);
