@@ -23,6 +23,7 @@ public:
 	Scalar color;
 
 	Cluster(int id, KeyPointPair* kpp, double timestamp);
+	Cluster(const Cluster &obj);
 	~Cluster(void);
 	void computePt(double timestamp);
 	Point3f movementVector();

@@ -292,10 +292,7 @@ vector<Cluster*> Clustering::Export(void)
 		if ((*cluster)->pairs.size() >= (size_t) export_min_pairs)
 		{
 			buffer.push_back(*cluster);
-		}
-		else
-		{
-			(*cluster)->unusedFor++;
+			cout << "Cluster " << (*cluster)->id << " position: " << (*cluster)->pt << endl;
 		}
 	}
 

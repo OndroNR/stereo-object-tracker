@@ -88,6 +88,15 @@ vector<Point3f> WorldCalibration::transform(vector<Point3f> pts)
 	return dst;
 }
 
+Point3f WorldCalibration::transform(Point3f pt)
+{
+	vector<Point3f> pts;
+	pts.push_back(pt);
+	vector<Point3f> dst;
+	perspectiveTransform(pts, dst, transformMatrix);
+	return dst[0];
+}
+
 vector<Point3f> WorldCalibration::transformOrigin(vector<Point3f> pts)
 {
 	vector<Point3f> dst;
@@ -101,11 +110,10 @@ vector<Point3f> WorldCalibration::transformOrigin(vector<Point3f> pts)
 	return dst;
 }
 
-Point3f WorldCalibration::transform(Point3f pt)
+Point3f WorldCalibration::transformOrigin(Point3f pt)
 {
 	vector<Point3f> pts;
 	pts.push_back(pt);
-	vector<Point3f> dst;
-	perspectiveTransform(pts, dst, transformMatrix);
-	return dst[0];
+
+	return transformOrigin(pts)[0];
 }

@@ -17,6 +17,7 @@
 #include "StereoReconstruction.h"
 #include "WorldCalibration.h"
 #include "Clustering.h"
+#include "OutputPostprocessing.h"
 #include "Fps.h"
 
 using namespace cv;
@@ -90,7 +91,7 @@ int main( int argc, char** argv )
 			{
 				delete svi;
 			}
-			svi = new StereoRecordInput(ConfigStore::get().getString("sri.path"), ConfigStore::get().getString("sri.frams_subpath"), ConfigStore::get().getString("sri.list_filename"));
+			svi = new StereoRecordInput(ConfigStore::get().getString("sri.path"), ConfigStore::get().getString("sri.frames_subpath"), ConfigStore::get().getString("sri.list_filename"));
 			
 			break;
 		case '2':
@@ -223,6 +224,7 @@ int main( int argc, char** argv )
 
 				Clustering clustering;
 				
+				OutputPostprocessing outputPostprocessing(&clustering, wc);
 
 				bool has_fg = false;
 
@@ -257,6 +259,8 @@ int main( int argc, char** argv )
 						sr.Process(mt.kpx, remap);
 
 						clustering.Process(sr.pairs, remap.timestamp);
+
+						outputPostprocessing.ProcessFrame(remap.timestamp);
 
 						//drawKeypoints(remap.frames[0], mt.kpx[0], remap_kp.frames[0]);
 						//drawKeypoints(remap.frames[0], dynamic_cast<vector<KeyPoint>>(mt.kpx[0]), remap_kp.frames[0]);
@@ -359,6 +363,10 @@ int main( int argc, char** argv )
 				cv::destroyWindow("Foreground mask");
 				cv::destroyWindow("Keypoints");
 				cv::destroyWindow("Cluster keypoints");
+
+				cout << "Writing output..." << endl;
+				outputPostprocessing.ComputeOutput();
+				outputPostprocessing.WriteOutput("d:\\data\\dp\\stereo\\150326-115859 capture5 out\\");
 				break;
 			}
 		case '8':

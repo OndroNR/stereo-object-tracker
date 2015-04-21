@@ -21,6 +21,21 @@ Cluster::Cluster(int id, KeyPointPair* kpp, double timestamp)
 	kpp->cluster = this;
 }
 
+Cluster::Cluster(const Cluster& obj)
+{
+	this->id = obj.id;
+	this->pairs = obj.pairs; // do not attempt to access KPP on cloned object, they might be already freed from memory
+	this->unusedFor = obj.unusedFor;
+	this->deadFor = obj.deadFor;
+	this->lowPointCountFor = obj.lowPointCountFor;
+	this->scheduledDelete = obj.scheduledDelete;
+	this->pt = obj.pt;
+	this->timestamp = obj.timestamp;
+	this->history_pt = obj.history_pt;
+	this->history_timestamp = obj.history_timestamp;
+	this->color = obj.color;
+}
+
 Cluster::~Cluster(void)
 {
 }

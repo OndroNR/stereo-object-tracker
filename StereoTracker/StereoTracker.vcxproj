@@ -90,6 +90,7 @@
     <ClCompile Include="KeyPointPair.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MotionTracking.cpp" />
+    <ClCompile Include="OutputPostprocessing.cpp" />
     <ClCompile Include="PointPicker.cpp" />
     <ClCompile Include="StereoCalibrate.cpp" />
     <ClCompile Include="StereoPreprocessing.cpp" />
@@ -109,6 +110,7 @@
     <ClInclude Include="KeyPointEx.h" />
     <ClInclude Include="KeyPointPair.h" />
     <ClInclude Include="MotionTracking.h" />
+    <ClInclude Include="OutputPostprocessing.h" />
     <ClInclude Include="PointPicker.h" />
     <ClInclude Include="StereoCalibrate.h" />
     <ClInclude Include="StereoPreprocessing.h" />
