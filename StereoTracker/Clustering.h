@@ -26,6 +26,11 @@ public:
 	float cluster_merge_length_limit;
 	float cluster_pair_angle_limit;
 	float cluster_pair_length_limit;
+	float cluster_pair_max_distance_from_average_multiplier;
+	float cluster_pair_max_distance_from_median_multiplier;
+	int cluster_lowpoint_threshold;
+	int cluster_lowpoint_frame_limit;
+	int cluster_dead_frame_limit;
 
 	bool Process(vector<KeyPointPair*> pairs, double timestamp);
 	vector<Cluster*> Export(void);

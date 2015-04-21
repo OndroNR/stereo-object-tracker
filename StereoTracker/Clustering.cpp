@@ -13,6 +13,11 @@ Clustering::Clustering(void)
 	cluster_merge_length_limit = ConfigStore::get().getFloat("clustering.cluster_merge_length_limit");
 	cluster_pair_angle_limit = (float) degreesToRadians(ConfigStore::get().getFloat("clustering.cluster_pair_angle_limit"));
 	cluster_pair_length_limit = ConfigStore::get().getFloat("clustering.cluster_pair_length_limit");
+	cluster_pair_max_distance_from_average_multiplier = ConfigStore::get().getFloat("clustering.cluster_pair_max_distance_from_average_multiplier");
+	cluster_pair_max_distance_from_median_multiplier = ConfigStore::get().getFloat("clustering.cluster_pair_max_distance_from_median_multiplier");
+	cluster_lowpoint_threshold = ConfigStore::get().getInt("clustering.cluster_lowpoint_threshold");
+	cluster_lowpoint_frame_limit = ConfigStore::get().getInt("clustering.cluster_lowpoint_frame_limit");
+	cluster_dead_frame_limit = ConfigStore::get().getInt("clustering.cluster_dead_frame_limit");
 }
 
 
@@ -221,7 +226,8 @@ bool Clustering::Process(vector<KeyPointPair*> pairs, double timestamp)
 					// remove pairs much farer than average distance from cluster position
 					for (vector<KeyPointPair*>::iterator pair = (*cluster)->pairs.begin(); pair < (*cluster)->pairs.end();)
 					{
-						if ( (*cluster)->distanceTo(*pair) > (averageDistance * 2.0)) // TODO: parametrizovat
+						if ( (*cluster)->distanceTo(*pair) > (averageDistance * cluster_pair_max_distance_from_average_multiplier)
+							|| (*cluster)->distanceTo(*pair) > (medianDistance * cluster_pair_max_distance_from_median_multiplier))
 						{
 							(*pair)->scheduleDelete();
 							pair = (*cluster)->pairs.erase(pair);
@@ -247,10 +253,10 @@ bool Clustering::Process(vector<KeyPointPair*> pairs, double timestamp)
 						(*pair)->unusedFor = 0;
 					}
 
-					if ((*cluster)->pairs.size() < 5) // TODO: parametrize
+					if ((*cluster)->pairs.size() < (size_t) cluster_lowpoint_threshold)
 					{
 						(*cluster)->lowPointCountFor++;
-						if ( (*cluster)->lowPointCountFor > 10) // TODO: parametrize
+						if ( (*cluster)->lowPointCountFor > cluster_lowpoint_frame_limit)
 						{
 							(*cluster)->scheduleDelete();
 							justDeletedForLowPointCount.push_back( (*cluster)->id );
@@ -265,7 +271,7 @@ bool Clustering::Process(vector<KeyPointPair*> pairs, double timestamp)
 				{
 					(*cluster)->deadFor++;
 					(*cluster)->lowPointCountFor = 0;
-					if ( (*cluster)->deadFor > 20) // TODO: parametrize
+					if ( (*cluster)->deadFor > cluster_dead_frame_limit)
 					{
 						(*cluster)->scheduleDelete();
 						justDeletedForNoPoints.push_back( (*cluster)->id );
@@ -292,7 +298,7 @@ vector<Cluster*> Clustering::Export(void)
 		if ((*cluster)->pairs.size() >= (size_t) export_min_pairs)
 		{
 			buffer.push_back(*cluster);
-			cout << "Cluster " << (*cluster)->id << " position: " << (*cluster)->pt << endl;
+			//cout << "Cluster " << (*cluster)->id << " position: " << (*cluster)->pt << endl;
 		}
 	}
 

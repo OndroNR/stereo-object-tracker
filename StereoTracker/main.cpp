@@ -366,7 +366,7 @@ int main( int argc, char** argv )
 
 				cout << "Writing output..." << endl;
 				outputPostprocessing.ComputeOutput();
-				outputPostprocessing.WriteOutput("d:\\data\\dp\\stereo\\150326-115859 capture5 out\\");
+				outputPostprocessing.WriteOutput(ConfigStore::get().getString("output.path"));
 				break;
 			}
 		case '8':

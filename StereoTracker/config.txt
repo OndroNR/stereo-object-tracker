@@ -8,6 +8,8 @@ sri.path=d:\data\dp\stereo\150326-115859 capture5\
 sri.frames_subpath=
 sri.list_filename=list.txt
 
+output.path = d:\data\dp\stereo\150326-115859 capture5 out\
+
 # frame size
 frame_width = 640
 frame_height = 480
@@ -60,6 +62,16 @@ clustering.cluster_merge_length_limit = 5
 clustering.cluster_pair_angle_limit = 45
 # per second movement
 clustering.cluster_pair_length_limit = 20
+
+
+clustering.cluster_pair_max_distance_from_average_multiplier = 2.0
+# large multiplier effectively disables check
+clustering.cluster_pair_max_distance_from_median_multiplier = 10.0
+
+clustering.cluster_lowpoint_threshold = 5
+clustering.cluster_lowpoint_frame_limit = 10
+
+clustering.cluster_dead_frame_limit = 20
 
 # apply distance threshold movement vector difference
 # movement vector difference threshold
