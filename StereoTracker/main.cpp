@@ -342,6 +342,7 @@ int main( int argc, char** argv )
 						// draw clusters on map
 						Mat cluster_img(480, 640, CV_8UC3);
 						float cluster_img_scale = 640.0 / 3.0; // 3m = 640px
+						cluster_img.setTo(Scalar(0,0,0));
 						for (int x = 0; x <= 5 ; x++)
 						{
 							line(cluster_img, Point(cluster_img_scale*x*0.6, 0), Point(cluster_img_scale*x*0.6, 479), Scalar(255,255,255));
@@ -356,16 +357,35 @@ int main( int argc, char** argv )
 						vector<Cluster*> out_clusters = clustering.Export();
 						for (Cluster* cluster : out_clusters)
 						{
-							pair<Point3f, Point3f> bbox = cluster->boundingBox();
-							bbox.first = wc->transformOrigin(bbox.first);
-							bbox.second = wc->transformOrigin(bbox.second);
+							// Can't transform bounding box to world coordinates this way
+							// Bounding box is positioned and rotated in camera space. It is skewed after transformation.
+							//pair<Point3f, Point3f> bbox = cluster->boundingBox();
+							//bbox.first = wc->transformOrigin(bbox.first);
+							//bbox.second = wc->transformOrigin(bbox.second);
+
+							Point3f cluster_pt = wc->transformOrigin(cluster->pt);
+							circle(cluster_img, Point(cluster_img_scale * (cluster_pt.x), 480-cluster_img_scale*cluster_pt.z), 3, cluster->color);
+
+							Point3f bbox_seed = wc->transformOrigin(cluster->pairs[0]->pt);
+							pair<Point3f, Point3f> bbox = pair<Point3f, Point3f>(bbox_seed, bbox_seed);
+
+							for (auto kpp : cluster->pairs)
+							{
+								Point3f kpp_pt = wc->transformOrigin(kpp->pt);
+								circle(cluster_img, Point(cluster_img_scale * (kpp_pt.x), 480-cluster_img_scale*kpp_pt.z), 1, cluster->color);
+
+								bbox.first.x = MIN(bbox.first.x, kpp_pt.x);
+								bbox.first.y = MIN(bbox.first.y, kpp_pt.y);
+								bbox.first.z = MIN(bbox.first.z, kpp_pt.z);
+								bbox.second.x = MAX(bbox.second.x, kpp_pt.x);
+								bbox.second.y = MAX(bbox.second.y, kpp_pt.y);
+								bbox.second.z = MAX(bbox.second.z, kpp_pt.z);
+							}
+
 							// ignore Y (height)
 							Point corner1 = Point(cluster_img_scale * (bbox.first.x), 480-cluster_img_scale * bbox.first.z);
 							Point corner2 = Point(cluster_img_scale * (bbox.second.x), 480-cluster_img_scale * bbox.second.z);
 							rectangle(cluster_img, corner1, corner2, cluster->color);
-
-							Point3f cluster_pt = wc->transformOrigin(cluster->pt);
-							circle(cluster_img, Point(cluster_img_scale * (cluster_pt.x), 480-cluster_img_scale*cluster_pt.z), 3, cluster->color);
 						}
 
 						imshow("Clusters", cluster_img);
