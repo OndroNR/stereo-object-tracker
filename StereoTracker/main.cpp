@@ -338,6 +338,39 @@ int main( int argc, char** argv )
 						}
 		
 						imshow("Cluster keypoints", clusterPoints);
+
+						// draw clusters on map
+						Mat cluster_img(480, 640, CV_8UC3);
+						float cluster_img_scale = 640.0 / 3.0; // 3m = 640px
+						for (int x = 0; x <= 5 ; x++)
+						{
+							line(cluster_img, Point(cluster_img_scale*x*0.6, 0), Point(cluster_img_scale*x*0.6, 479), Scalar(255,255,255));
+						}
+						for (int y = 0; y <= 3 ; y++)
+						{
+							line(cluster_img, Point(0, 480-cluster_img_scale*y*0.6), Point(639, 480-cluster_img_scale*y*0.6), Scalar(255,255,255));
+						}
+						line(cluster_img, Point(cluster_img_scale*4.3*0.6, 0), Point(cluster_img_scale*4.3*0.6, 479), Scalar(255,255,255));
+						line(cluster_img, Point(0, 480-cluster_img_scale*3.2*0.6), Point(639, 480-cluster_img_scale*3.2*0.6), Scalar(255,255,255));
+
+						vector<Cluster*> out_clusters = clustering.Export();
+						for (Cluster* cluster : out_clusters)
+						{
+							pair<Point3f, Point3f> bbox = cluster->boundingBox();
+							bbox.first = wc->transformOrigin(bbox.first);
+							bbox.second = wc->transformOrigin(bbox.second);
+							// ignore Y (height)
+							Point corner1 = Point(cluster_img_scale * (bbox.first.x), 480-cluster_img_scale * bbox.first.z);
+							Point corner2 = Point(cluster_img_scale * (bbox.second.x), 480-cluster_img_scale * bbox.second.z);
+							rectangle(cluster_img, corner1, corner2, cluster->color);
+
+							Point3f cluster_pt = wc->transformOrigin(cluster->pt);
+							circle(cluster_img, Point(cluster_img_scale * (cluster_pt.x), 480-cluster_img_scale*cluster_pt.z), 3, cluster->color);
+						}
+
+						imshow("Clusters", cluster_img);
+
+
 					}
 
 					fps.update();
@@ -363,6 +396,7 @@ int main( int argc, char** argv )
 				cv::destroyWindow("Foreground mask");
 				cv::destroyWindow("Keypoints");
 				cv::destroyWindow("Cluster keypoints");
+				cv::destroyWindow("Clusters");
 
 				cout << "Writing output..." << endl;
 				outputPostprocessing.ComputeOutput();
