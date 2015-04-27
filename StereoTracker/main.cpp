@@ -10,6 +10,8 @@
 #include "ConfigStore.h"
 #include "StereoVideoInput.h"
 #include "StereoRecordInput.h"
+#include "StereoRecordOutput.h"
+#include "StereoCameraInput.h"
 #include "StereoCalibrate.h"
 #include "StereoPreprocessing.h"
 #include "BackgroundProcessing.h"
@@ -18,6 +20,7 @@
 #include "WorldCalibration.h"
 #include "Clustering.h"
 #include "OutputPostprocessing.h"
+#include "StereoRecordOutput.h"
 #include "Fps.h"
 
 using namespace cv;
@@ -38,6 +41,11 @@ void showMenu()
 	cout << "9 - set world origin\n";
 	cout << "p - save world calibration\n";
 	cout << "o - load world calibration\n";
+	cout << "v - open stereo camera\n";
+	cout << "b - swap stereo camera\n";
+	cout << "n - open left camera settings\n";
+	cout << "m - open right camera settings\n";
+	cout << "r - record stereo\n";
 	cout << "0 - reload config\n";
 	cout << "q - quit\n";
 	cout << "Select command: ";
@@ -534,10 +542,88 @@ int main( int argc, char** argv )
 
 			break;
 
+		case 'v':
+		case 'V':
+			if (svi == NULL)
+			{
+				delete svi;
+			}
+			
+			svi = new StereoCameraInput(ConfigStore::get().getInt("sci.left_cam"), ConfigStore::get().getInt("sci.right_cam"));
 
+			break;
 
+		case 'b':
+		case 'B':
+			if (svi == NULL)
+			{
+				cout << "Stereo stream not loaded";
+				break;
+			}
 
+			svi->swap_cams = !svi->swap_cams;
+			break;
 
+		case 'n':
+		case 'N':
+			if (svi == NULL)
+			{
+				cout << "Stereo stream not loaded";
+				break;
+			}
+
+			svi->OpenSettings(false);
+			break;
+
+		case 'm':
+		case 'M':
+			if (svi == NULL)
+			{
+				cout << "Stereo stream not loaded";
+				break;
+			}
+
+			svi->OpenSettings(true);
+			break;
+
+		case 'r':
+		case 'R':
+			{
+				if (svi == NULL)
+				{
+					cout << "Stereo stream not loaded";
+					break;
+				}
+
+				fps = Fps();
+				counter = 0;
+
+				StereoRecordOutput* sro = new StereoRecordOutput(ConfigStore::get().getString("sro.path"), ConfigStore::get().getString("sro.frames_subpath"), ConfigStore::get().getString("sro.list_filename"));
+
+				while (true)
+				{
+					struct StereoPair sp;
+					svi->GetNextPair(sp);
+					sro->WritePair(sp);
+
+					fps.update();
+					counter++;
+					if (counter % 5 == 0)
+					{
+						imshow("Stereo video", sideBySideMat(sp.frames[0], sp.frames[1]));
+						std::cout << "Processing fps: " << fps.get() << endl;
+					}
+
+					int key = waitKey(5);
+					if(key >= 0)
+					{
+						break;
+					}
+				}
+				destroyWindow("Stereo video");
+				delete sro;
+			}
+			break;
 
 		case '0':
 			if (loadConfig())
@@ -545,6 +631,7 @@ int main( int argc, char** argv )
 				cout << "Config reloaded" << endl;
 			}
 			break;
+
 		case 'q':
 		case 'Q':
 			quit = true;

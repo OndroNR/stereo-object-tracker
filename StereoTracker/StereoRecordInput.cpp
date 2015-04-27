@@ -23,6 +23,8 @@ StereoRecordInput::StereoRecordInput(std::string path, std::string frames_subpat
 	{
 		frames_path = path + PATH_SEPARATOR + frames_subpath;
 	}
+
+	swap_cams = false;
 }
 
 StereoRecordInput::~StereoRecordInput(void)
@@ -65,4 +67,9 @@ void StereoRecordInput::Reset()
 {
 	filestream.clear();
 	filestream.seekg(0, filestream.beg);
+}
+
+void StereoRecordInput::OpenSettings(bool _right_cam)
+{
+	
 }

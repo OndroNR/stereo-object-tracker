@@ -17,5 +17,6 @@ public:
 	~StereoRecordInput(void);
 	virtual bool GetNextPair(struct StereoPair &stereoPair);
 	virtual void Reset();
+	virtual void OpenSettings(bool _right_cam);
 };
 

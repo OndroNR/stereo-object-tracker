@@ -93,9 +93,11 @@
     <ClCompile Include="OutputPostprocessing.cpp" />
     <ClCompile Include="PointPicker.cpp" />
     <ClCompile Include="StereoCalibrate.cpp" />
+    <ClCompile Include="StereoCameraInput.cpp" />
     <ClCompile Include="StereoPreprocessing.cpp" />
     <ClCompile Include="StereoReconstruction.cpp" />
     <ClCompile Include="StereoRecordInput.cpp" />
+    <ClCompile Include="StereoRecordOutput.cpp" />
     <ClCompile Include="StereoVideoInput.cpp" />
     <ClCompile Include="WorldCalibration.cpp" />
   </ItemGroup>
@@ -113,9 +115,11 @@
     <ClInclude Include="OutputPostprocessing.h" />
     <ClInclude Include="PointPicker.h" />
     <ClInclude Include="StereoCalibrate.h" />
+    <ClInclude Include="StereoCameraInput.h" />
     <ClInclude Include="StereoPreprocessing.h" />
     <ClInclude Include="StereoReconstruction.h" />
     <ClInclude Include="StereoRecordInput.h" />
+    <ClInclude Include="StereoRecordOutput.h" />
     <ClInclude Include="StereoVideoInput.h" />
     <ClInclude Include="WorldCalibration.h" />
   </ItemGroup>

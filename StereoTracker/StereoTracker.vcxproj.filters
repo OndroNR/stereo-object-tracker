@@ -66,6 +66,12 @@
     <ClCompile Include="OutputPostprocessing.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="StereoCameraInput.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StereoRecordOutput.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StereoVideoInput.h">
@@ -120,6 +126,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="OutputPostprocessing.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StereoCameraInput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StereoRecordOutput.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

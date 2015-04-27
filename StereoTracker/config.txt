@@ -8,6 +8,16 @@ sri.path=d:\data\dp\stereo\150326-115859 capture5\
 sri.frames_subpath=
 sri.list_filename=list.txt
 
+# StereoCameraInput
+sci.left_cam = 1
+sci.right_cam = 2
+
+# StereoRecordOutput
+sro.path=d:\data\dp\stereo\sro\
+sro.frames_subpath=
+sro.list_filename=list.txt
+
+# Trajectory dir
 output.path = d:\data\dp\stereo\150326-115859 capture5 out\
 
 # frame size
