@@ -5,18 +5,27 @@ using namespace cv;
 
 WorldCalibration::WorldCalibration(void)
 {
-	for (int i = 0; i < 4; i++)
+	// default real world points
+	//points[1].push_back(Point3f(0,0,0));
+	//points[1].push_back(Point3f(1,0,0));
+	//points[1].push_back(Point3f(0,1,0));
+	//points[1].push_back(Point3f(0,0,1));
+
+	points[1].push_back(Point3f(0,0,0));
+	points[1].push_back(Point3f(1.2,0,0));
+	points[1].push_back(Point3f(2.9,1.2,0));
+	points[1].push_back(Point3f(0,0,1.2));
+	points[1].push_back(Point3f(0.6,0,0.6));
+	points[1].push_back(Point3f(1.2,0,1.2));
+	points[1].push_back(Point3f(1.8,0,1.8));
+	points[1].push_back(Point3f(1.8,0,0.6));
+
+	for (int i = 0; i < points[1].size(); i++)
 	{
 		points[0].push_back(Point3f(0,0,0));
 		imagePoints[0].push_back(Point(0,0));
 		imagePoints[1].push_back(Point(0,0));
 	}
-	
-	// default real world points
-	points[1].push_back(Point3f(0,0,0));
-	points[1].push_back(Point3f(1,0,0));
-	points[1].push_back(Point3f(0,1,0));
-	points[1].push_back(Point3f(0,0,1));
 }
 
 
@@ -46,7 +55,7 @@ void WorldCalibration::setPoints(StereoPair frames)
 	PointPicker picker;
 
 	// need four points, each left and right
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < points[1].size(); i++)
 	{
 		cout << "=== Calibration point " << to_string(i) << "===" << endl;
 		Point3f world = points[1][i];
