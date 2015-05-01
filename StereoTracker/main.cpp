@@ -421,7 +421,24 @@ int main( int argc, char** argv )
 					cout << "Current cluster count: " << clustering.clusters.size() << endl;
 
 					int key = waitKey(5);
-					if(key >= 0)
+					bool end = false;
+					switch (key)
+					{
+						case 'q':
+						case 'Q':
+							end = true;
+							cout << "Processing was ended by user." << endl;
+							break;
+						case 'c':
+							clustering.cluster_merge_distance_limit = 0;
+							cout << "Cluster merging disabled." << endl;
+							break;
+						case 'v':
+							clustering.cluster_merge_distance_limit = ConfigStore::get().getFloat("clustering.cluster_merge_distance_limit");
+							cout << "Cluster merging enabled." << endl;
+							break;
+					}
+					if(end)
 					{
 						break;
 					}
