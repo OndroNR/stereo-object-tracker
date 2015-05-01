@@ -19,6 +19,7 @@ public:
 class OutputPostprocessing
 {
 public:
+	OutputPostprocessing();
 	OutputPostprocessing(Clustering* clustering, WorldCalibration* wc);
 	~OutputPostprocessing(void);
 

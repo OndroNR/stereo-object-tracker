@@ -7,6 +7,7 @@ using namespace cv;
 class StereoPreprocessing
 {
 public:
+	StereoPreprocessing();
 	StereoPreprocessing(StereoCalibration* scp, Size imageSize, float alpha);
 	~StereoPreprocessing(void);
 	bool ProcessPair(struct StereoPair& inputPair, struct StereoPair& outputPair);

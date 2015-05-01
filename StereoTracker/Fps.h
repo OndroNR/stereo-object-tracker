@@ -1,4 +1,6 @@
 // Source: http://noobtuts.com/cpp/frames-per-second
+#pragma once
+
 #include "Interval.h"
 
 class Fps

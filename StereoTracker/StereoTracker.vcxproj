@@ -99,6 +99,7 @@
     <ClCompile Include="StereoRecordInput.cpp" />
     <ClCompile Include="StereoRecordOutput.cpp" />
     <ClCompile Include="StereoVideoInput.cpp" />
+    <ClCompile Include="Tracker.cpp" />
     <ClCompile Include="WorldCalibration.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -121,6 +122,7 @@
     <ClInclude Include="StereoRecordInput.h" />
     <ClInclude Include="StereoRecordOutput.h" />
     <ClInclude Include="StereoVideoInput.h" />
+    <ClInclude Include="Tracker.h" />
     <ClInclude Include="WorldCalibration.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

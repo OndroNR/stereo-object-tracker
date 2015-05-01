@@ -2,6 +2,10 @@
 
 using namespace cv;
 
+StereoPreprocessing::StereoPreprocessing()
+{
+}
+
 StereoPreprocessing::StereoPreprocessing(StereoCalibration* scp, Size imageSize, float alpha)
 {
 	this->scp = scp;

@@ -12,6 +12,10 @@ OutputEntry::OutputEntry(double timestamp, vector<Cluster*> clusters/*, vector<p
 	}
 }
 
+OutputPostprocessing::OutputPostprocessing()
+{
+}
+
 OutputPostprocessing::OutputPostprocessing(Clustering* clustering, WorldCalibration* wc)
 {
 	this->clustering = clustering;

@@ -1,4 +1,6 @@
 // Source: http://noobtuts.com/cpp/interval
+#pragma once
+
 #ifdef _WIN32
 #include <windows.h>
 #elif
