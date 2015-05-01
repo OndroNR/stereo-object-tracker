@@ -242,7 +242,12 @@ int main( int argc, char** argv )
 				for (;;)
 				{
 					struct StereoPair sp;
-					svi->GetNextPair(sp);
+					if (!svi->GetNextPair(sp))
+					{
+						std::cout << "End of stream (or error getting frames)" << endl;
+						break;
+					}
+
 					cout << endl << "Frame number: " << frame_num++ << ", timestamp: " << sp.timestamp << endl;
 
 					//imshow("Input pair", sideBySideMat(sp.frames[0], sp.frames[1]));
