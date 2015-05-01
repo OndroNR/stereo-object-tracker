@@ -64,6 +64,73 @@ bool loadConfig()
 	return true;
 }
 
+void open_stereo_record(StereoVideoInput* &svi)
+{
+	if (svi != nullptr)
+	{
+		delete svi;
+	}
+	svi = new StereoRecordInput(ConfigStore::get().getString("sri.path"), ConfigStore::get().getString("sri.frames_subpath"), ConfigStore::get().getString("sri.list_filename"));
+}
+
+void run_calibration(StereoVideoInput* &svi, StereoCalibrate* &sc, StereoCalibration* &scp)
+{
+	if (svi == nullptr)
+	{
+		cout << "Stereo stream not loaded";
+		return;
+	}
+
+	if (sc != nullptr)
+		delete sc;
+	sc = new StereoCalibrate(svi,
+		Size(ConfigStore::get().getInt("calibration_pattern.cols"), ConfigStore::get().getInt("calibration_pattern.rows")),
+		ConfigStore::get().getFloat("calibration_pattern.square_size")); // 10x7 squares, 2.4cm square size
+	sc->calibrate(true);
+
+	if (sc->isCalibrated())
+		scp = sc->getCalibrationParams();
+
+	cout << *scp << endl;
+}
+
+void save_calibration(StereoCalibrate* &sc, StereoCalibration* &scp, FileStorage &fs)
+{
+	if (sc == nullptr)
+	{
+		cout << "Not calibrated";
+		return;
+	}
+	else if (scp == nullptr)
+	{
+		cout << "Calibration missing (failed?)";
+		return;
+	}
+
+	scp = sc->getCalibrationParams();
+	fs = FileStorage(ConfigStore::get().getString("stereo_calibration_path"), FileStorage::WRITE);
+	fs << "stereo_calibration" << *scp;
+	fs.release();
+	cout << "Calibration saved" << endl;
+}
+
+void load_calibration(StereoCalibration* &scp, FileStorage &fs)
+{
+	fs = FileStorage();
+	fs.open(ConfigStore::get().getString("stereo_calibration_path"), FileStorage::READ);
+
+	if (!fs.isOpened())
+	{
+		cerr << "Failed to open calibration file" << endl;
+		return;
+	}
+
+	scp = new StereoCalibration();
+	fs["stereo_calibration"] >> *scp;
+	cout << "Calibration loaded" << endl;
+	cout << *scp;	
+}
+
 int main( int argc, char** argv )
 {
 	if (!loadConfig())
@@ -74,9 +141,9 @@ int main( int argc, char** argv )
 	bool quit = false;
 	char menu_cmd = '%'; // nothing
 
-	StereoVideoInput* svi = NULL;
-	StereoCalibrate* sc = NULL;
-	StereoCalibration* scp = NULL;
+	StereoVideoInput* svi = nullptr;
+	StereoCalibrate* sc = nullptr;
+	StereoCalibration* scp = nullptr;
 	WorldCalibration* wc = new WorldCalibration();
 	FileStorage fs;
 	Fps fps;
@@ -95,68 +162,21 @@ int main( int argc, char** argv )
 		switch(menu_cmd)
 		{
 		case '1':
-			if (svi != NULL)
-			{
-				delete svi;
-			}
-			svi = new StereoRecordInput(ConfigStore::get().getString("sri.path"), ConfigStore::get().getString("sri.frames_subpath"), ConfigStore::get().getString("sri.list_filename"));
-			
+			open_stereo_record(svi);
 			break;
+
 		case '2':
-			if (svi == NULL)
-			{
-				cout << "Stereo stream not loaded";
-				break;
-			}
-
-			if (sc != NULL)
-				delete sc;
-			sc = new StereoCalibrate(svi,
-				Size(ConfigStore::get().getInt("calibration_pattern.cols"), ConfigStore::get().getInt("calibration_pattern.rows")),
-				ConfigStore::get().getFloat("calibration_pattern.square_size")); // 10x7 squares, 2.4cm square size
-			sc->calibrate(true);
-
-			if (sc->isCalibrated())
-				scp = sc->getCalibrationParams();
-
-			cout << *scp << endl;
-
+			run_calibration(svi, sc, scp);
 			break;
+
 		case '3':
-			if (sc == NULL)
-			{
-				cout << "Not calibrated";
-				break;
-			}
-			else if (scp == NULL)
-			{
-				cout << "Calibration missing (failed?)";
-				break;
-			}
-
-			scp = sc->getCalibrationParams();
-			fs = FileStorage(ConfigStore::get().getString("stereo_calibration_path"), FileStorage::WRITE);
-			fs << "stereo_calibration" << *scp;
-			fs.release();
-			cout << "Calibration saved" << endl;
-
+			save_calibration(sc, scp, fs);
 			break;
+
 		case '4':
-			fs = FileStorage();
-			fs.open(ConfigStore::get().getString("stereo_calibration_path"), FileStorage::READ);
-
-			if (!fs.isOpened())
-			{
-				cerr << "Failed to open calibration file" << endl;
-				break;
-			}
-
-			scp = new StereoCalibration();
-			fs["stereo_calibration"] >> *scp;
-			cout << "Calibration loaded" << endl;
-			cout << *scp;
-
+			load_calibration(scp, fs);
 			break;
+
 		case '5':
 			if (svi == NULL)
 			{
