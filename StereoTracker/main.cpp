@@ -401,6 +401,9 @@ int main( int argc, char** argv )
 							rectangle(cluster_img, corner1, corner2, cluster->color);
 						}
 
+						rectangle(cluster_img, Point(0,0), Point(200, 20), Scalar(0,0,0), CV_FILLED);
+						putText(cluster_img, to_string(remap.timestamp), Point(0,15), CV_FONT_HERSHEY_PLAIN, 1.0, Scalar(255,255,255));
+
 						imshow("Clusters", cluster_img);
 
 
