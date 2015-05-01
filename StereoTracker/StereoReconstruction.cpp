@@ -22,7 +22,7 @@ StereoReconstruction::~StereoReconstruction(void)
 	}
 }
 
-bool StereoReconstruction::Process(vector<KeyPointEx*> kpx[2], StereoPair& frames)
+void StereoReconstruction::Cleanup(StereoPair& frames)
 {
 	if (pairs.size() != 0)
 	{
@@ -69,7 +69,10 @@ bool StereoReconstruction::Process(vector<KeyPointEx*> kpx[2], StereoPair& frame
 		//	}
 		//}
 	}
+}
 
+void StereoReconstruction::Match(vector<KeyPointEx*>* kpx, StereoPair& frames)
+{
 	if (kpx[0].size() != 0 && kpx[1].size() != 0)
 	{
 		vector<KeyPoint> kp_direct[2];
@@ -152,6 +155,13 @@ bool StereoReconstruction::Process(vector<KeyPointEx*> kpx[2], StereoPair& frame
 			}
 		}
 	}
+}
+
+bool StereoReconstruction::Process(vector<KeyPointEx*> kpx[2], StereoPair& frames)
+{
+	Cleanup(frames);
+
+	Match(kpx, frames);
 
 	// schedule unused pairs for deletion
 	if (pairs.size() > 0)

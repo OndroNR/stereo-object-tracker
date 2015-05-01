@@ -21,5 +21,8 @@ public:
 	bool same_movement_filter_enabled;
 	bool regular_check_pair_validity;
 	int unused_pair_frame_limit;
+protected:
+	void Cleanup(StereoPair& frames);
+	void Match(vector<KeyPointEx*>* kpx, StereoPair& frames);
 };
 
