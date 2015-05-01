@@ -9,6 +9,10 @@ class Clustering
 public:
 	Clustering(void);
 	~Clustering(void);
+	void Cleanup(int& active_clusters_count);
+	void MakeClusters(vector<KeyPointPair*>& pairs, double timestamp, int active_clusters_count);
+	void MergeClusters();
+	void ClusterProcessing(double timestamp);
 	vector<Cluster*> clusters;
 	int next_cluster_id;
 

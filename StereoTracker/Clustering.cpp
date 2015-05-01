@@ -31,14 +31,8 @@ Clustering::~Clustering(void)
 }
 
 
-bool Clustering::Process(vector<KeyPointPair*> pairs, double timestamp)
+void Clustering::Cleanup(int& active_clusters_count)
 {
-	justMergedWith.clear();
-	justDeletedForLowPointCount.clear();
-	justDeletedForNoPoints.clear();
-
-	int active_clusters_count = 0;
-	// cleanup
 	for (vector<Cluster*>::iterator cluster = clusters.begin(); cluster < clusters.end();)
 	{
 		if ((*cluster)->scheduledDelete)
@@ -68,8 +62,11 @@ bool Clustering::Process(vector<KeyPointPair*> pairs, double timestamp)
 			active_clusters_count++;
 		}
 	}
+}
 
-	// Ak ziadne klastre, tak vytvor klaster z prveho paru
+void Clustering::MakeClusters(vector<KeyPointPair*>& pairs, double timestamp, int active_clusters_count)
+{
+	// Make cluster from first KeyPointPair if no clusters
 	if (active_clusters_count == 0)
 	{
 		if (pairs.size() > 0)
@@ -79,7 +76,7 @@ bool Clustering::Process(vector<KeyPointPair*> pairs, double timestamp)
 		}
 	}
 
-	// (Vsetky zvysne nepouzite pary).each do |kpp|
+	// Iterate rest unused KPP
 	if (pairs.size() > 0)
 	{
 		for (vector<KeyPointPair*>::iterator kpp = pairs.begin(); kpp < pairs.end(); ++kpp)
@@ -88,7 +85,7 @@ bool Clustering::Process(vector<KeyPointPair*> pairs, double timestamp)
 			{
 				vector<Cluster *> candidates;
 
-				// najst vhodnych cluster kandidatov podla klastrov
+				// find cluster candidates by close clusters
 				if (clusters.size() > 0)
 				{
 					for (vector<Cluster*>::iterator cluster = clusters.begin(); cluster < clusters.end(); ++cluster)
@@ -102,7 +99,7 @@ bool Clustering::Process(vector<KeyPointPair*> pairs, double timestamp)
 					}
 				}
 				
-				// najst vhodnych cluster kandidatov podla KPP
+				// find cluster candidates by close KPP
 				if (pairs.size() > 0)
 				{
 					for (vector<KeyPointPair*>::iterator pair = pairs.begin(); pair < pairs.end(); ++pair)
@@ -122,21 +119,21 @@ bool Clustering::Process(vector<KeyPointPair*> pairs, double timestamp)
 
 				if (candidates.size() > 0)
 				{
-					// zoradit podla vzdialenosti
+					// sort by distance
 					sort(candidates.begin(), candidates.end(),
-						[kpp](Cluster* a, Cluster* b) -> bool
-						{ 
-							return a->distanceTo(*kpp) < b->distanceTo(*kpp); 
-						}
+					     [kpp](Cluster* a, Cluster* b) -> bool
+					     { 
+						     return a->distanceTo(*kpp) < b->distanceTo(*kpp); 
+					     }
 					);
 
-					// unikatne
+					// unique
 					candidates.erase( unique( candidates.begin(), candidates.end() ), candidates.end() );
 
-					// postupne testovat vyhovujuci pohyb
+					// find first cluster with similar movement
 					for (vector<Cluster*>::iterator cluster = candidates.begin(); cluster < candidates.end(); ++cluster)
 					{
-						// vyhovuje pohyb?
+						// is movement similar?
 						if (isMovementAngleSimilar(*cluster, *kpp, cluster_pair_angle_limit) && isMovementLengthSimilar(*cluster, *kpp, cluster_pair_length_limit))
 						{
 							real_candidate = *cluster;
@@ -152,7 +149,7 @@ bool Clustering::Process(vector<KeyPointPair*> pairs, double timestamp)
 					}
 				}
 
-				// ked nemame vyhovujuci klaster, vytvorime novy klaster
+				// if no appropriate cluster found, create new
 				if (real_candidate == NULL)
 				{
 					real_candidate = new Cluster(next_cluster_id++, *kpp, timestamp);
@@ -161,8 +158,12 @@ bool Clustering::Process(vector<KeyPointPair*> pairs, double timestamp)
 			}
 		}
 	}
+}
 
-	// Merge close clusters if similar movement
+void Clustering::MergeClusters()
+{
+	// finds close clusters with similar movement and merges them
+
 	if (clusters.size() > 1)
 	{
 		bool something_left;
@@ -197,27 +198,20 @@ bool Clustering::Process(vector<KeyPointPair*> pairs, double timestamp)
 				break;
 		}
 	}
+}
 
-
-	if (pairs.size() > 0)
-	{
-		for (vector<KeyPointPair*>::iterator pair = pairs.begin(); pair < pairs.end(); ++pair)
-		{
-			(*pair)->unusedFor++; // will be reset on used pairs later
-		}
-	}
-
-	// Each cluster processing
+void Clustering::ClusterProcessing(double timestamp)
+{
 	if (clusters.size() > 0)
 	{
 		for (vector<Cluster*>::iterator cluster = clusters.begin(); cluster < clusters.end(); ++cluster)
 		{
 			if ((*cluster)->scheduledDelete == false)
 			{
-				// 1. update polohy + 2. dead reckoning
+				// 1. update position + 2. dead reckoning
 				(*cluster)->computePt(timestamp);
 
-				// TODO: 3. overenie ci pary suhlasia s pohybom, ak nie, vyclenit prec
+				
 				if ((*cluster)->pairs.size() > 0)
 				{
 					float averageDistance = (*cluster)->averagePointDistance();
@@ -238,11 +232,6 @@ bool Clustering::Process(vector<KeyPointPair*> pairs, double timestamp)
 						}
 					}
 				}
-
-				// cluster_pair_angle_limit
-				// cluster_pair_length_limit
-				// cluster_pair_distance_limit?
-
 
 				//	4. kpp[].unusedFor = 0; deadFor management
 				if ((*cluster)->pairs.size() > 0)
@@ -280,6 +269,32 @@ bool Clustering::Process(vector<KeyPointPair*> pairs, double timestamp)
 			}
 		}
 	}
+}
+
+bool Clustering::Process(vector<KeyPointPair*> pairs, double timestamp)
+{
+	justMergedWith.clear();
+	justDeletedForLowPointCount.clear();
+	justDeletedForNoPoints.clear();
+
+	int active_clusters_count = 0;
+
+	Cleanup(active_clusters_count);
+
+	MakeClusters(pairs, timestamp, active_clusters_count);
+
+	MergeClusters();
+
+
+	if (pairs.size() > 0)
+	{
+		for (vector<KeyPointPair*>::iterator pair = pairs.begin(); pair < pairs.end(); ++pair)
+		{
+			(*pair)->unusedFor++; // will be reset on used pairs later
+		}
+	}
+
+	ClusterProcessing(timestamp);
 
 	return true;
 }
