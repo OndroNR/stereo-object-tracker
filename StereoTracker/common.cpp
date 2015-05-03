@@ -21,7 +21,7 @@ Mat sideBySideMat(Mat a, Mat b)
 }
 
 // http://answers.opencv.org/question/27695/puttext-with-black-background/
-void setLabel(cv::Mat& im, const std::string label, const cv::Point & or)
+void setLabel(cv::Mat& im, const std::string label, const cv::Point & pt)
 {
 	int fontface = cv::FONT_HERSHEY_SIMPLEX;
 	double scale = 0.4;
@@ -29,8 +29,8 @@ void setLabel(cv::Mat& im, const std::string label, const cv::Point & or)
 	int baseline = 0;
 
 	cv::Size text = cv::getTextSize(label, fontface, scale, thickness, &baseline);
-	cv::rectangle(im, or + cv::Point(0, baseline), or + cv::Point(text.width, -text.height), CV_RGB(0,0,0), CV_FILLED);
-	cv::putText(im, label, or, fontface, scale, CV_RGB(255,255,255), thickness, 8);
+	cv::rectangle(im, pt + cv::Point(0, baseline), pt + cv::Point(text.width, -text.height), CV_RGB(0,0,0), CV_FILLED);
+	cv::putText(im, label, pt, fontface, scale, CV_RGB(255,255,255), thickness, 8);
 }
 
 // StereoCalibration class read/write functions for OpenCV FileStorage
