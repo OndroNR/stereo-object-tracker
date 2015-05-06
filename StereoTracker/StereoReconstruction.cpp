@@ -9,6 +9,7 @@ StereoReconstruction::StereoReconstruction(void)
 	line_filter_limit = ConfigStore::get().getInt("sr.line_filter_limit");
 	same_movement_filter_enabled = ConfigStore::get().getInt("sr.same_movement_filter_enabled") > 0;
 	regular_check_pair_validity = ConfigStore::get().getInt("sr.regular_check_pair_validity") > 0;
+	regular_check_frame_rate = ConfigStore::get().getInt("sr.regular_check_frame_rate");
 	unused_pair_frame_limit = ConfigStore::get().getInt("sr.unused_pair_frame_limit");
 }
 
@@ -60,14 +61,32 @@ void StereoReconstruction::Cleanup(StereoPair& frames)
 
 		// TODO: kontrola parov, ci este sedia ak neboli skontrolovane po N framoch. Ak nesedie, scheduleDelete na KPP aj KPX[2]
 		// regular_check_pair_validity
-		//for (vector<KeyPointPair*>::iterator it = pairs.begin(); it < pairs.end(); ++it)
-		//{
-		//	if ( (*it)->uncheckedFor > 10 )
-		//	{
-		//		// check
-		//		// scheduleDelete if failed
-		//	}
-		//}
+		for (vector<KeyPointPair*>::iterator it = pairs.begin(); it < pairs.end(); ++it)
+		{
+			if (regular_check_pair_validity)
+			{
+				if ( (*it)->uncheckedFor > 10 )
+				{
+					vector<KeyPoint> kp_direct[2];
+					Mat descriptors[2];
+
+					for (int k = 0; k < 2; k++)
+					{
+						kp_direct[k].push_back( static_cast<KeyPoint>( *(*it)->kpx[k]) );
+
+						extractor->compute(frames.frames[k], kp_direct[k], descriptors[k]);
+					}
+
+					vector<DMatch> matches;
+					matcher->match(descriptors[0], descriptors[1], matches);
+					if (matches.size() == 0)
+					{
+						(*it)->scheduleDelete();
+					}
+
+				}
+			}
+		}
 	}
 }
 
