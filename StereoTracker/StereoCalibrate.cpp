@@ -89,6 +89,8 @@ void StereoCalibrate::calibrate(bool showImages)
 		cerr << "Not enough chessboards found" << endl;
 		return;
     }
+	
+	cout << "Found " << chessboard_count << " chessboard pairs." << endl;
 
 	imagePoints[0].resize(chessboard_count);
     imagePoints[1].resize(chessboard_count);

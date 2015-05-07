@@ -87,7 +87,7 @@ void run_calibration(StereoVideoInput* &svi, StereoCalibrate* &sc, StereoCalibra
 	sc = new StereoCalibrate(svi,
 		Size(ConfigStore::get().getInt("calibration_pattern.cols"), ConfigStore::get().getInt("calibration_pattern.rows")),
 		ConfigStore::get().getFloat("calibration_pattern.square_size")); // 10x7 squares, 2.4cm square size
-	sc->calibrate(true);
+	sc->calibrate(false);
 
 	if (sc->isCalibrated())
 		scp = sc->getCalibrationParams();
