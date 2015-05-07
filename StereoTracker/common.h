@@ -105,6 +105,7 @@ std::string trim_copy(
 void _drawKeypoint( Mat& img, const KeyPoint& p, const Scalar& color, int flags );
 
 double angleBetween(Point3f pt1, Point3f pt2);
+double angleBetween(Point pt1, Point pt2);
 
 inline double degreesToRadians(double dgr)
 {

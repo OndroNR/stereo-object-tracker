@@ -19,6 +19,8 @@ public:
 	bool line_filter_enabled;
 	int line_filter_limit;
 	bool same_movement_filter_enabled;
+	float same_movement_angle_limit;
+	float same_movement_distance_limit;
 	bool regular_check_pair_validity;
 	int regular_check_frame_rate;
 	int unused_pair_frame_limit;

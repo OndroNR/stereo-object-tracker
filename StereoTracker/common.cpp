@@ -141,6 +141,11 @@ double angleBetween(Point3f pt1, Point3f pt2)
 	return atan2(norm(pt1.cross(pt2)), pt1.dot(pt2));
 }
 
+double angleBetween(Point pt1, Point pt2)
+{
+	return atan2(norm(pt1.cross(pt2)), pt1.dot(pt2));
+}
+
 float vecAverage(vector<float> v)
 {
 	float acc = 0;

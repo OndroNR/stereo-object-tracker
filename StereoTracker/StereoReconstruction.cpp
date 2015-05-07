@@ -8,6 +8,8 @@ StereoReconstruction::StereoReconstruction(void)
 	line_filter_enabled = ConfigStore::get().getInt("sr.line_filter_enabled") > 0;
 	line_filter_limit = ConfigStore::get().getInt("sr.line_filter_limit");
 	same_movement_filter_enabled = ConfigStore::get().getInt("sr.same_movement_filter_enabled") > 0;
+	same_movement_angle_limit = (float) degreesToRadians(ConfigStore::get().getFloat("sr.same_movement_angle_limit"));
+	same_movement_distance_limit = ConfigStore::get().getFloat("sr.same_movement_distance_limit");
 	regular_check_pair_validity = ConfigStore::get().getInt("sr.regular_check_pair_validity") > 0;
 	regular_check_frame_rate = ConfigStore::get().getInt("sr.regular_check_frame_rate");
 	unused_pair_frame_limit = ConfigStore::get().getInt("sr.unused_pair_frame_limit");
@@ -59,12 +61,37 @@ void StereoReconstruction::Cleanup(StereoPair& frames)
 			}
 		}
 
-		// TODO: kontrola parov, ci este sedia ak neboli skontrolovane po N framoch. Ak nesedie, scheduleDelete na KPP aj KPX[2]
-		// regular_check_pair_validity
-		for (vector<KeyPointPair*>::iterator it = pairs.begin(); it < pairs.end(); ++it)
+		if (regular_check_pair_validity)
 		{
-			if (regular_check_pair_validity)
+			for (vector<KeyPointPair*>::iterator it = pairs.begin(); it < pairs.end(); ++it)
 			{
+				if (line_filter_enabled) // line filter
+				{
+					float line_diff = abs((*it)->kpx[0]->pt.y - (*it)->kpx[1]->pt.y);
+					if (line_diff > line_filter_limit)
+					{
+						(*it)->scheduleDelete();
+						continue;
+					}
+				}
+
+				if (same_movement_filter_enabled)
+				{
+					float angle_diff = (float) abs(angleBetween((*it)->kpx[0]->lastMove, (*it)->kpx[1]->lastMove));
+					if (angle_diff > same_movement_angle_limit)
+					{
+						(*it)->scheduleDelete();
+						continue;
+					}
+
+					float length_diff = (float) abs(norm((*it)->kpx[0]->lastMove) - norm((*it)->kpx[1]->lastMove));
+					if (length_diff > same_movement_distance_limit)
+					{
+						(*it)->scheduleDelete();
+						continue;
+					}
+				}
+
 				if ( (*it)->uncheckedFor > 10 )
 				{
 					vector<KeyPoint> kp_direct[2];
@@ -134,9 +161,17 @@ void StereoReconstruction::Match(vector<KeyPointEx*>* kpx, StereoPair& frames)
 
 				if (same_movement_filter_enabled) // same movement
 				{
-					// TODO: - check na suladny pohyb - nesmie byt prilis rozdielny
-					// gain * deltaAngle + gain deltaVecSize
+					float angle_diff = (float) abs(angleBetween(kp_direct_kpx[0][match->queryIdx]->lastMove, kp_direct_kpx[1][match->trainIdx]->lastMove));
+					if (angle_diff > same_movement_angle_limit)
+					{
+						continue;
+					}
 
+					float length_diff = (float) abs(norm(kp_direct_kpx[0][match->queryIdx]->lastMove) - norm(kp_direct_kpx[1][match->trainIdx]->lastMove));
+					if (length_diff > same_movement_distance_limit)
+					{
+						continue;
+					}
 				}
 
 				//if (kp_direct_kpx[0][match->queryIdx]->hasPair)

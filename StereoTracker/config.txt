@@ -45,10 +45,11 @@ mt.similiar_as_limit = 5
 # StereoReconstrution
 sr.line_filter_enabled = 1
 sr.line_filter_limit = 2
-sr.same_movement_filter_enabled = 1
-sr.regular_check_pair_validity = 1
+sr.same_movement_filter_enabled = 0
+sr.same_movement_angle_limit = 45
+sr.same_movement_distance_limit = 1
 sr.regular_check_pair_validity = 0
-sr.regular_check_frame_rate = 10
+sr.regular_check_frame_rate = 1000
 sr.unused_pair_frame_limit = 10
 
 # whole 3D space rotation, translation, scaling
