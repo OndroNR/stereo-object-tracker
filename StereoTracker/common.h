@@ -88,7 +88,7 @@ struct RectificationParams
 };
 
 cv::Mat sideBySideMat(cv::Mat a, cv::Mat b);
-void setLabel(cv::Mat& im, const std::string label, const cv::Point & or);
+void setLabel(cv::Mat& im, const std::string label, const cv::Point & pt);
 void write(FileStorage& fs, const std::string&, const StereoCalibration& x);
 void read(const FileNode& node, StereoCalibration& x, const StereoCalibration& default_value = StereoCalibration());
 

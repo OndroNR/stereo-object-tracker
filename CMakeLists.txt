@@ -14,4 +14,5 @@ file(GLOB st_SRC
 
 add_executable(stereo_tracker ${st_SRC})
 target_link_libraries(stereo_tracker ${OpenCV_LIBS})
+list( APPEND CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS} -g -ftest-coverage -fprofile-arcs")
 

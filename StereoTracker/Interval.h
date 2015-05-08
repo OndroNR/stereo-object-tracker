@@ -3,7 +3,7 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#elif
+#else
 #include <sys/time.h>
 #endif
 
