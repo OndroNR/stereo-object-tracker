@@ -33,6 +33,7 @@ MotionTracking::~MotionTracking(void)
 bool MotionTracking::ProcessPair(struct StereoPair& frames, struct StereoPair& fg_mask)
 {
 	// for left & right frame
+	#pragma omp parallel for
 	for (int k = 0; k < 2; k++)
 	{
 		// remove keypoints scheduled for deletion

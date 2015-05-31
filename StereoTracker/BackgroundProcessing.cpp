@@ -21,6 +21,7 @@ BackgroundProcessing::~BackgroundProcessing(void)
 
 bool BackgroundProcessing::ProcessPair(struct StereoPair& frames, struct StereoPair& foregroundMask)
 {
+	#pragma omp parallel for
 	for (int k = 0; k < 2; k++)
 	{
 		mog[k](frames.frames[k], foregroundMask.frames[k]);

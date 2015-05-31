@@ -126,6 +126,7 @@ void StereoReconstruction::Match(vector<KeyPointEx*>* kpx, StereoPair& frames)
 		vector<bool> kp_direct_matched[2];
 		Mat descriptors[2];
 
+		#pragma omp parallel for
 		for (int k = 0; k < 2; k++)
 		{
 			// extract descriptor for keypoints, which won't be deleted and are not paired

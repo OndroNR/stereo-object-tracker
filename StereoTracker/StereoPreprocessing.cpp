@@ -34,8 +34,12 @@ StereoPreprocessing::~StereoPreprocessing(void)
 
 bool StereoPreprocessing::ProcessPair(struct StereoPair& inputPair, struct StereoPair& outputPair)
 {
-	cv::remap(inputPair.frames[0], outputPair.frames[0], rmap[0][0], rmap[0][1], CV_INTER_LINEAR);
-	cv::remap(inputPair.frames[1], outputPair.frames[1], rmap[1][0], rmap[1][1], CV_INTER_LINEAR);
+	#pragma omp parallel for
+	for (int i = 0; i < 2; i++)
+	{
+		cv::remap(inputPair.frames[i], outputPair.frames[i], rmap[i][0], rmap[i][1], CV_INTER_LINEAR);
+	}
+
 	outputPair.timestamp = inputPair.timestamp;
 
 	return true;
