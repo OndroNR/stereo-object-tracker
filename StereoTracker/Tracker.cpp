@@ -38,12 +38,16 @@ bool Tracker::ProcessFrame()
 
 	//imshow("Input pair", sideBySideMat(sp.frames[0], sp.frames[1]));
 					
+	Interval iTotal;
 
+	Interval iSP;
 	stereoPrep->ProcessPair(sp, remap);
-
+	auto iSPv = iSP.value();
 	//imshow("Remapped pair", sideBySideMat(remap.frames[0], remap.frames[1]));
 
+	Interval iBG;
 	bgProc.ProcessPair(remap, fgMaskMOG2);
+	auto iBGv = iBG.value();
 
 	imshow("Foreground mask", sideBySideMat(fgMaskMOG2.frames[0], fgMaskMOG2.frames[1]));
 
@@ -53,11 +57,21 @@ bool Tracker::ProcessFrame()
 	}
 	else
 	{
+		
+
+		Interval iMT;
 		mt.ProcessPair(remap, fgMaskMOG2);
+		auto iMTv = iMT.value();
 
+		Interval iSR;
 		sr.Process(mt.kpx, remap);
+		auto iSRv = iSR.value();
 
+		Interval iC;
 		clustering.Process(sr.pairs, remap.timestamp);
+		auto iCv = iC.value();
+
+		cout << "T:" << iTotal.value() << ";" << iSPv << ";" << iBGv << ";" << iMTv << ";" << iSRv << ";" << iCv << endl;
 
 		outputPostprocessing.ProcessFrame(remap.timestamp);
 

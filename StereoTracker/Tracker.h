@@ -15,6 +15,7 @@
 #include "OutputPostprocessing.h"
 #include "Fps.h"
 #include "Tracker.h"
+#include "Interval.h"
 
 using namespace cv;
 using namespace std;
